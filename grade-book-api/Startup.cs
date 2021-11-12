@@ -66,6 +66,7 @@ namespace grade_book_api
             } );
             
             services.AddScoped<IUserJwtAuthService, UserJwtAuthService>();
+            services.AddScoped<IUserServices, UserService>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(EfRepository<>)); 
         }
 

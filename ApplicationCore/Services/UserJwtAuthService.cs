@@ -25,10 +25,19 @@ namespace ApplicationCore.Services
 
         public string TryGetToken(string usernameOrEmail, string password)
         {
-            throw new NotImplementedException();
+            User foundUser = _repository.GetFirst(user => user.Username == usernameOrEmail || user.Email == usernameOrEmail);
+            if (foundUser is null)
+                return null;
+            bool success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
+
+            if (!success)
+                return null;
+
+            return GenerateJwtToken(foundUser); 
         }
 
-        public User CreateNewUser(string username, string password, string email, string firstName, string lastName)
+        public User CreateNewUser(string username, string password, string email, string firstName, string lastName,
+            string profilePictureUrl)
         {
             var foundUser = _repository.GetFirst(user => user.Username == username || user.Email == email);
 
@@ -41,6 +50,7 @@ namespace ApplicationCore.Services
             userToAdd.Email = email;
             userToAdd.FirstName = firstName;
             userToAdd.LastName = lastName;
+            userToAdd.ProfilePictureUrl = profilePictureUrl;
             HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
 
             userToAdd.PasswordSalt = newPasswordSalt;

@@ -7,7 +7,8 @@ namespace ApplicationCore.Interfaces
         {
             string TryGetToken(string usernameOrEmail, string password);
 
-            User CreateNewUser(string username, string password, string email, string firstName, string lastName); 
+            User CreateNewUser(string username, string password, string email, string firstName, string lastName,
+                string profilePictureUrl); 
         
         } 
 }

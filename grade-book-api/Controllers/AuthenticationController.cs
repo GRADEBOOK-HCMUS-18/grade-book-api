@@ -1,6 +1,7 @@
 using System;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests;
+using grade_book_api.Responses.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,9 +14,13 @@ namespace grade_book_api.Controllers
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IUserJwtAuthService _authService;
+        private readonly IUserServices _userService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IUserJwtAuthService authService)
+        public AuthenticationController(ILogger<AuthenticationController> logger
+              , IUserJwtAuthService authService
+              , IUserServices userService)
         {
+            _userService = userService; 
             _logger = logger;
             _authService = authService; 
         }
@@ -36,8 +41,19 @@ namespace grade_book_api.Controllers
                     request.Password, 
                     request.Email,
                     request.FirstName,
-                    request.LastName);
-                return Ok(new {});
+                    request.LastName,
+                    request.ProfilePictureUrl);
+                var tokenToSend = _authService.TryGetToken(request.Username, request.Password);
+                var response = new LoginResponse()
+                {
+                    Username = request.Username,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    ProfilePictureUrl = request.ProfilePictureUrl,
+                    Token = tokenToSend
+                };
+                return Ok(response);
             }
             catch (ApplicationException exception)
             {
@@ -45,14 +61,30 @@ namespace grade_book_api.Controllers
             }
         }
         
+        [AllowAnonymous]
         [HttpPost]
         public IActionResult TryLogin([FromBody] AuthenticateRequest request)
         {
+            var foundUser = _userService.GetUserByNameOrEmail(request.UsernameOrEmail);
 
+            if (foundUser is null)
+            {
+                return Unauthorized("No user with that username or email");
+            }
             string token = _authService.TryGetToken(request.UsernameOrEmail, request.Password);
             if (token is null)
-                return Unauthorized();
-            return Ok(new {User = request.UsernameOrEmail, Token = token}); 
+                return Unauthorized("Wrong credential");
+
+            var response = new LoginResponse()
+            {
+                Username = foundUser.Username,
+                Email = foundUser.LastName,
+                FirstName = foundUser.FirstName,
+                LastName = foundUser.LastName,
+                ProfilePictureUrl = foundUser.ProfilePictureUrl,
+                Token = token
+            };
+            return Ok(response); 
 
 
         }
