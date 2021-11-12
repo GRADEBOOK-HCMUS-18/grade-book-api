@@ -12,5 +12,6 @@ namespace ApplicationCore.Entity
         public string InviteString { get; set; }
         public User MainTeacher { get; set; }
         public IList<ClassStudents> ClassStudents { get; set; }
+        public IList<ClassTeachers> ClassTeachers { get; set; }
     }
 }

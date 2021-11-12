@@ -16,5 +16,6 @@ namespace ApplicationCore.Entity
         public string ProfilePictureUrl { get; set; }
         public string StudentIdentification { get; set; }
         public IList<ClassStudents> ClassStudents { get; set; }
+        public IList<ClassTeachers> ClassTeachers { get; set;  }
     }
 }
