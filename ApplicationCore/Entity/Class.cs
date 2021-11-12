@@ -9,9 +9,8 @@ namespace ApplicationCore.Entity
         public DateTime StartDate { get; set; }
         public string Room { get; set; }
         public string Description { get; set; }
-
+        public string InviteString { get; set; }
         public User MainTeacher { get; set; }
-        public ICollection<User> SubTeachers { get; set; }
-        public ICollection<User> Students { get; set; }
+        public IList<ClassStudents> ClassStudents { get; set; }
     }
 }

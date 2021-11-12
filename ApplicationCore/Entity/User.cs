@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace ApplicationCore.Entity
 {
     public class User : BaseEntity
@@ -12,5 +15,6 @@ namespace ApplicationCore.Entity
         public byte[] PasswordSalt { get; set; }
         public string ProfilePictureUrl { get; set; }
         public string StudentIdentification { get; set; }
+        public IList<ClassStudents> ClassStudents { get; set; }
     }
 }
