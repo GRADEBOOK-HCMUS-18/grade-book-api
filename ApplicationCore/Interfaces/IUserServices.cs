@@ -6,5 +6,6 @@ namespace ApplicationCore.Interfaces
     {
         public User GetUserById(int id);
         public  User GetUserByNameOrEmail(string usernameOrEmail);
+        public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification); 
     }
 }

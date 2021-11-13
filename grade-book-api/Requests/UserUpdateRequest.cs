@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace grade_book_api.Requests
 {
-    public class UserRegisterRequest
+    public class UserUpdateRequest
     {
-        [Required]
+        
         [MinLength(8)]
         public string Username { get; set; }
-        [Required]
         [EmailAddress]
         public string Email { get; set;  }
         [Required]
@@ -19,6 +19,6 @@ namespace grade_book_api.Requests
         
         [MaxLength(32)]
         public string LastName { get; set; }
-        public string ProfilePictureUrl { get; set; }
+
     }
 }
