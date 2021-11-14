@@ -52,8 +52,7 @@ namespace grade_book_api.Controllers
         public IActionResult UpdateUserAvatar(IFormFile image)
         {
             
-            //var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
-            int userId = 4; 
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             Console.WriteLine($"Receiving change avatar request from {userId}");
             // validate 
             if (image is null) return BadRequest("Empty file");
