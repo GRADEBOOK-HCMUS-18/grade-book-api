@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+using CloudinaryDotNet;
+
 namespace grade_book_api
 {
     public class Startup
@@ -58,11 +60,22 @@ namespace grade_book_api
                 };
             });
             services.AddAuthorization();
+            
+            // set up cloudinary
+            string cloud = Configuration.GetValue<string>("AccountSettings:CloudName");
+            string apiKey = Configuration.GetValue<string>("AccountSettings:ApiKey");
+            string apiSecret = Configuration.GetValue<string>("AccountSettings:ApiSecret");
+            Account cloudinaryAccount = new Account(cloud, apiKey, apiSecret);
+
+            Cloudinary cloudinary = new Cloudinary(cloudinaryAccount);
+            // set up DI services
 
 
             services.AddScoped<IUserJwtAuthService, UserJwtAuthService>();
             services.AddScoped<IUserServices, UserService>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(EfRepository<>));
+            services.AddScoped<ICloudPhotoHandler, CloudinaryPhotoHandler>();
+            services.AddSingleton(cloudinary);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

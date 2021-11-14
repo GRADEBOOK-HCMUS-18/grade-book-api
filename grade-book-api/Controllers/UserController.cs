@@ -18,11 +18,13 @@ namespace grade_book_api.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserServices _userServices;
+        private readonly ICloudPhotoHandler _cloudPhotoHandler;
 
-        public UserController(ILogger<UserController> logger, IUserServices userServices)
+        public UserController(ILogger<UserController> logger, IUserServices userServices, ICloudPhotoHandler cloudPhotoHandler)
         {
             _logger = logger;
             _userServices = userServices;
+            _cloudPhotoHandler = cloudPhotoHandler;
         }
 
         [HttpGet]
@@ -50,6 +52,8 @@ namespace grade_book_api.Controllers
         [Route("avatar")]
         public IActionResult UpdateUserAvatar(IFormFile file)
         {
+            
+            //var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             // validate 
             if (file is null) return BadRequest("Empty file");
             if (file.Length <= 0) return BadRequest("Empty file");
@@ -67,7 +71,20 @@ namespace grade_book_api.Controllers
             var fileExtension = Path.GetExtension(file.FileName);
 
             _logger.LogInformation($"Received file with extension {fileExtension}");
-            return Ok();
+            // try upload the file 
+            string resultUploadUrl;
+            using (Stream stream = file.OpenReadStream())
+            {
+                resultUploadUrl =  _cloudPhotoHandler.Upload(stream);    
+                
+            }
+
+            if (string.IsNullOrEmpty(resultUploadUrl))
+            {
+                return StatusCode(500,new {Error = "Error happened while uploading picture to cloud"});
+            }
+
+            return Ok( new { ProfilePictureUrl = resultUploadUrl});
         }
     }
 }
