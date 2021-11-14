@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using ApplicationCore.Interfaces;
@@ -23,7 +24,12 @@ namespace Infrastructure
             var uploadConfig = new ImageUploadParams()
             {
                 File = new FileDescription("pic", readStream),
-                Tags = "grade-book-backend-api"
+                Tags = "grade-book-backend-api",
+                EagerTransforms = new List<Transformation>
+                {
+                    new EagerTransformation().Width(250).Height(250).Crop("scale")
+                }
+                       
             };
             var result = _cloudinary.Upload(uploadConfig); 
             _logger.LogCritical(result.StatusCode.ToString());
