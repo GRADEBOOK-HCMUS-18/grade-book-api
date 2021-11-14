@@ -1,3 +1,4 @@
+using System.IO;
 using ApplicationCore.Entity;
 
 namespace ApplicationCore.Interfaces
@@ -9,5 +10,7 @@ namespace ApplicationCore.Interfaces
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
             string newPassword, string newEmail);
+
+        public string UpdateUserAvatar(int id, Stream newPicture); 
     }
 }

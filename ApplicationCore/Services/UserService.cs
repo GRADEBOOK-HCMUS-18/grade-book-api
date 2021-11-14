@@ -1,3 +1,4 @@
+using System.IO;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -9,11 +10,13 @@ namespace ApplicationCore.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly ICloudPhotoHandler _cloudPhotoHandler;
 
-        public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository)
+        public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository, ICloudPhotoHandler cloudPhotoHandler)
         {
             _logger = logger;
             _userRepository = userRepository;
+            _cloudPhotoHandler = cloudPhotoHandler;
         }
 
         public User GetUserById(int id)
@@ -60,6 +63,24 @@ namespace ApplicationCore.Services
 
             var result = _userRepository.Update(found);
             return result;
+        }
+
+        public string UpdateUserAvatar(int id, Stream newPicture)
+        {
+            var found = _userRepository.GetFirst(user => user.Id == id);
+            if (found is null)
+                return null;
+            var resultUrl = _cloudPhotoHandler.Upload(newPicture);
+
+            if (string.IsNullOrEmpty(resultUrl))
+            {
+                return null;
+            }
+
+            found.ProfilePictureUrl = resultUrl;
+            _userRepository.Update(found);
+
+            return resultUrl;
         }
     }
 }

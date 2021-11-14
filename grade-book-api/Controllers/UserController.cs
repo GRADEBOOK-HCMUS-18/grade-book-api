@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,13 +19,11 @@ namespace grade_book_api.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserServices _userServices;
-        private readonly ICloudPhotoHandler _cloudPhotoHandler;
 
-        public UserController(ILogger<UserController> logger, IUserServices userServices, ICloudPhotoHandler cloudPhotoHandler)
+        public UserController(ILogger<UserController> logger, IUserServices userServices)
         {
             _logger = logger;
             _userServices = userServices;
-            _cloudPhotoHandler = cloudPhotoHandler;
         }
 
         [HttpGet]
@@ -50,14 +49,16 @@ namespace grade_book_api.Controllers
         [HttpPut]
         [AllowAnonymous]
         [Route("avatar")]
-        public IActionResult UpdateUserAvatar(IFormFile file)
+        public IActionResult UpdateUserAvatar(IFormFile image)
         {
             
             //var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            int userId = 4; 
+            Console.WriteLine($"Receiving change avatar request from {userId}");
             // validate 
-            if (file is null) return BadRequest("Empty file");
-            if (file.Length <= 0) return BadRequest("Empty file");
-            _logger.LogInformation($"Received file with content type {file.ContentType}");
+            if (image is null) return BadRequest("Empty file");
+            if (image.Length <= 0) return BadRequest("Empty file");
+            _logger.LogInformation($"Received file with content type {image.ContentType}");
             var allowedContentType = new List<string>
             {
                 "image/jpg",
@@ -65,18 +66,18 @@ namespace grade_book_api.Controllers
                 "image/pjpeg",
                 "image/png"
             };
-            if (!allowedContentType.Contains(file.ContentType.ToLower()))
+            if (!allowedContentType.Contains(image.ContentType.ToLower()))
                 return BadRequest("Content type is not image");
 
-            var fileExtension = Path.GetExtension(file.FileName);
+            var fileExtension = Path.GetExtension(image.FileName);
 
             _logger.LogInformation($"Received file with extension {fileExtension}");
             // try upload the file 
             string resultUploadUrl;
-            using (Stream stream = file.OpenReadStream())
+            using (Stream stream = image.OpenReadStream())
             {
-                resultUploadUrl =  _cloudPhotoHandler.Upload(stream);    
-                
+                resultUploadUrl = _userServices.UpdateUserAvatar(userId, stream);
+
             }
 
             if (string.IsNullOrEmpty(resultUploadUrl))
