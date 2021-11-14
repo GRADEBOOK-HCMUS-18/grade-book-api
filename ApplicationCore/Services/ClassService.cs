@@ -4,7 +4,7 @@ using ApplicationCore.Interfaces;
 
 namespace ApplicationCore.Services
 {
-    public class ClassService: IClassService
+    public class ClassService : IClassService
     {
         public Class GetClassDetail(int classId)
         {

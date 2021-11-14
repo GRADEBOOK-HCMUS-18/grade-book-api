@@ -7,6 +7,7 @@ using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using SharedKernel;
 
 namespace ApplicationCore.Services
 {
@@ -25,53 +26,41 @@ namespace ApplicationCore.Services
 
         public string TryGetToken(string usernameOrEmail, string password)
         {
-            User foundUser = _repository.GetFirst(user => user.Username == usernameOrEmail || user.Email == usernameOrEmail);
+            var foundUser =
+                _repository.GetFirst(user => user.Username == usernameOrEmail || user.Email == usernameOrEmail);
             if (foundUser is null)
                 return null;
-            bool success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
+            var success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
 
             if (!success)
                 return null;
 
-            return GenerateJwtToken(foundUser); 
+            return GenerateJwtToken(foundUser);
         }
 
         public User CreateNewUser(string username, string password, string email, string firstName, string lastName,
-            string profilePictureUrl)
+            string profilePictureUrl, string defaultProfilePictureHex)
         {
             var foundUser = _repository.GetFirst(user => user.Username == username || user.Email == email);
 
-            if (foundUser is not null)
-            {
-                throw new ApplicationException("Existed user"); 
-            }
-            User userToAdd = new User();
+            if (foundUser is not null) throw new ApplicationException("Existed user");
+            var userToAdd = new User();
             userToAdd.Username = username;
             userToAdd.Email = email;
             userToAdd.FirstName = firstName;
             userToAdd.LastName = lastName;
             userToAdd.ProfilePictureUrl = profilePictureUrl;
-            HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
+            userToAdd.DefaultProfilePictureHex = defaultProfilePictureHex;
+            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
 
             userToAdd.PasswordSalt = newPasswordSalt;
             userToAdd.PasswordHash = newPasswordHash;
 
-            _repository.Insert(userToAdd); 
-            
+            _repository.Insert(userToAdd);
+
             return userToAdd;
         }
 
-        private void HashPassword(string inputPassword, out byte[] salt, out byte[] hash)
-        {
-            if (inputPassword == null || string.IsNullOrWhiteSpace(inputPassword))
-                throw new ArgumentException("Password is undefied");
-
-            using (var randomhash = new HMACSHA512())
-            {
-                salt = randomhash.Key;
-                hash = randomhash.ComputeHash(Encoding.UTF8.GetBytes(inputPassword));
-            }
-        }
 
         private bool CheckPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
         {
@@ -94,7 +83,7 @@ namespace ApplicationCore.Services
         private string GenerateJwtToken(User user)
         {
             var hourToRefresher = 10;
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("3aacfb02-b67b-4923-8a2d-21a103902b91"));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 

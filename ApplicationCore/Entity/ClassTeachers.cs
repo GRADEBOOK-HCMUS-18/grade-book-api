@@ -1,6 +1,6 @@
 namespace ApplicationCore.Entity
 {
-    public class ClassTeachers: BaseEntity
+    public class ClassTeachers : BaseEntity
     {
         public int ClassId { get; set; }
         public Class Class { get; set; }

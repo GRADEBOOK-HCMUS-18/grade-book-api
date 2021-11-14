@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using ApplicationCore.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,14 +6,17 @@ namespace Infrastructure
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options): base(options){}
-        
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<ClassStudents> ClassStudents { get; set; }
         public DbSet<ClassTeachers> ClassTeachers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
+        {
             // setting up class-user-classstudents
             // set up composite key
             modelBuilder.Entity<ClassStudents>().HasKey(cs => new {cs.ClassId, cs.StudentId});
@@ -29,10 +31,10 @@ namespace Infrastructure
                 .HasOne(cs => cs.Student)
                 .WithMany(s => s.ClassStudents)
                 .HasForeignKey(cs => cs.StudentId);
-            
-            
+
+
             // setting up class-user-classteachers
-            
+
             modelBuilder.Entity<ClassTeachers>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             // set up one-many between ClassTeacher and Class
             modelBuilder.Entity<ClassTeachers>()
@@ -45,11 +47,9 @@ namespace Infrastructure
                 .HasOne(ct => ct.Teacher)
                 .WithMany(s => s.ClassTeachers)
                 .HasForeignKey(ct => ct.TeacherId);
-            
+
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            {
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
-            }
         }
     }
 }

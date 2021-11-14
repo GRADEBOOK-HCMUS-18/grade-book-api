@@ -8,31 +8,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
 {
-    public class EfRepository<TEntity>: IBaseRepository<TEntity> where TEntity: BaseEntity
+    public class EfRepository<TEntity> : IBaseRepository<TEntity> where TEntity : BaseEntity
     {
-        private AppDbContext _dbSet; 
+        private readonly AppDbContext _dbSet;
+
         public EfRepository(AppDbContext dbSet)
         {
             _dbSet = dbSet;
         }
+
         public TEntity GetById(int id)
         {
-            return _dbSet.Set<TEntity>().FirstOrDefault(obj => obj.Id == id); 
+            return _dbSet.Set<TEntity>().FirstOrDefault(obj => obj.Id == id);
         }
 
         public TEntity GetFirst(Expression<Func<TEntity, bool>> predicate)
         {
-            return _dbSet.Set<TEntity>().FirstOrDefault(predicate); 
+            return _dbSet.Set<TEntity>().FirstOrDefault(predicate);
         }
 
         public void Delete(TEntity entity)
         {
             var found = GetById(entity.Id);
-            
+
             var result = _dbSet.Remove(found);
 
             _dbSet.SaveChanges();
-
         }
 
         public TEntity Insert(TEntity entity)
@@ -67,22 +68,14 @@ namespace Infrastructure
 
         {
             IQueryable<TEntity> query = _dbSet.Set<TEntity>();
-            if (filter is not null)
-            {
-                query = query.Where(filter);
-            }
+            if (filter is not null) query = query.Where(filter);
 
-            var includes = includeProperties.Split(new char[] {',','|'});
-            if (!String.IsNullOrEmpty(includeProperties))
-            {
+            var includes = includeProperties.Split(',', '|');
+            if (!string.IsNullOrEmpty(includeProperties))
                 query = includes
                     .Aggregate(query, (current, property) => current.Include(property));
-            }
 
-            if (orderBy is not null)
-            {
-                query = orderBy(query); 
-            }
+            if (orderBy is not null) query = orderBy(query);
 
             return query.ToList();
         }

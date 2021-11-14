@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace ApplicationCore.Entity
@@ -14,8 +13,9 @@ namespace ApplicationCore.Entity
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public string ProfilePictureUrl { get; set; }
+        public string DefaultProfilePictureHex { get; set; }
         public string StudentIdentification { get; set; }
         public IList<ClassStudents> ClassStudents { get; set; }
-        public IList<ClassTeachers> ClassTeachers { get; set;  }
+        public IList<ClassTeachers> ClassTeachers { get; set; }
     }
 }
