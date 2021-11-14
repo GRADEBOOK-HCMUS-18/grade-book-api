@@ -78,7 +78,7 @@ namespace grade_book_api.Controllers
             var response = new LoginResponse
             {
                 Username = foundUser.Username,
-                Email = foundUser.LastName,
+                Email = foundUser.Email,
                 FirstName = foundUser.FirstName,
                 LastName = foundUser.LastName,
                 ProfilePictureUrl = foundUser.ProfilePictureUrl,
