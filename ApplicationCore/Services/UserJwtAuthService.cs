@@ -24,10 +24,10 @@ namespace ApplicationCore.Services
             _repository = repository;
         }
 
-        public string TryGetToken(string usernameOrEmail, string password)
+        public string TryGetToken(string email, string password)
         {
             var foundUser =
-                _repository.GetFirst(user => user.Username == usernameOrEmail || user.Email == usernameOrEmail);
+                _repository.GetFirst(user =>  user.Email == email);
             if (foundUser is null)
                 return null;
             var success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
@@ -38,14 +38,13 @@ namespace ApplicationCore.Services
             return GenerateJwtToken(foundUser);
         }
 
-        public User CreateNewUser(string username, string password, string email, string firstName, string lastName,
+        public User CreateNewUser( string password, string email, string firstName, string lastName,
             string profilePictureUrl, string defaultProfilePictureHex)
         {
-            var foundUser = _repository.GetFirst(user => user.Username == username || user.Email == email);
+            var foundUser = _repository.GetFirst(user =>  user.Email == email);
 
             if (foundUser is not null) throw new ApplicationException("Existed user");
             var userToAdd = new User();
-            userToAdd.Username = username;
             userToAdd.Email = email;
             userToAdd.FirstName = firstName;
             userToAdd.LastName = lastName;
@@ -93,8 +92,7 @@ namespace ApplicationCore.Services
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("ID", user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim("Username", user.Username)
+                    new Claim(ClaimTypes.Email, user.Email)
                 }),
                 SigningCredentials = credentials,
                 Expires = DateTime.Now.AddHours(hourToRefresher)

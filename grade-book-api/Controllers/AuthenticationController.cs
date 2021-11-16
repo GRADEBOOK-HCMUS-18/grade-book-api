@@ -38,20 +38,19 @@ namespace grade_book_api.Controllers
         {
             try
             {
-                var newUser = _authService.CreateNewUser(request.Username,
+                var newUser = _authService.CreateNewUser(
                     request.Password,
                     request.Email,
                     request.FirstName,
                     request.LastName,
                     request.ProfilePictureUrl,
                     request.DefaultProfilePictureHex);
-                var tokenToSend = _authService.TryGetToken(request.Username, request.Password);
+                var tokenToSend = _authService.TryGetToken(request.Email, request.Password);
                 var response = new LoginResponse
                 {
-                    Username = newUser.Username,
+                    Email = newUser.Email,
                     FirstName = newUser.FirstName,
                     LastName = newUser.LastName,
-                    Email = newUser.Email,
                     ProfilePictureUrl = newUser.ProfilePictureUrl,
                     DefaultProfilePictureHex = newUser.DefaultProfilePictureHex,
                     Token = tokenToSend
@@ -68,16 +67,15 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult TryLogin([FromBody] AuthenticateRequest request)
         {
-            var foundUser = _userService.GetUserByNameOrEmail(request.UsernameOrEmail);
+            var foundUser = _userService.GetUserByNameOrEmail(request.Email);
 
             if (foundUser is null) return Unauthorized("No user with that username or email");
-            var token = _authService.TryGetToken(request.UsernameOrEmail, request.Password);
+            var token = _authService.TryGetToken(request.Email, request.Password);
             if (token is null)
                 return Unauthorized("Wrong credential");
 
             var response = new LoginResponse
             {
-                Username = foundUser.Username,
                 Email = foundUser.Email,
                 FirstName = foundUser.FirstName,
                 LastName = foundUser.LastName,

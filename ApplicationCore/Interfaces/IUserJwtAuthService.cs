@@ -4,9 +4,9 @@ namespace ApplicationCore.Interfaces
 {
     public interface IUserJwtAuthService
     {
-        string TryGetToken(string usernameOrEmail, string password);
+        string TryGetToken(string email, string password);
 
-        User CreateNewUser(string username, string password, string email, string firstName, string lastName,
+        User CreateNewUser( string password, string email, string firstName, string lastName,
             string profilePictureUrl, string defaultProfilePictureHex);
     }
 }

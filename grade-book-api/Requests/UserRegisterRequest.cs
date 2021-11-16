@@ -4,7 +4,6 @@ namespace grade_book_api.Requests
 {
     public class UserRegisterRequest
     {
-        [Required] [MinLength(8)] public string Username { get; set; }
 
         [Required] [EmailAddress] public string Email { get; set; }
 

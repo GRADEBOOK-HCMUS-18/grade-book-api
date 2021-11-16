@@ -30,10 +30,10 @@ namespace ApplicationCore.Services
             return found;
         }
 
-        public User GetUserByNameOrEmail(string usernameOrEmail)
+        public User GetUserByNameOrEmail(string email)
         {
             var found = _userRepository.GetFirst(user =>
-                user.Email == usernameOrEmail || user.Username == usernameOrEmail);
+                user.Email == email );
 
             if (found is null)
                 return null;
