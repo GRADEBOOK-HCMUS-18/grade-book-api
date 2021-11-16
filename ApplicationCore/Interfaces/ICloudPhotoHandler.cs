@@ -4,6 +4,6 @@ namespace ApplicationCore.Interfaces
 {
     public interface ICloudPhotoHandler
     {
-        string Upload(Stream readStream); 
+        string Upload(Stream readStream);
     }
 }

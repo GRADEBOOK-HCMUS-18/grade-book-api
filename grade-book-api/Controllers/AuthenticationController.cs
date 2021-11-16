@@ -46,15 +46,7 @@ namespace grade_book_api.Controllers
                     request.ProfilePictureUrl,
                     request.DefaultProfilePictureHex);
                 var tokenToSend = _authService.TryGetToken(request.Email, request.Password);
-                var response = new LoginResponse
-                {
-                    Email = newUser.Email,
-                    FirstName = newUser.FirstName,
-                    LastName = newUser.LastName,
-                    ProfilePictureUrl = newUser.ProfilePictureUrl,
-                    DefaultProfilePictureHex = newUser.DefaultProfilePictureHex,
-                    Token = tokenToSend
-                };
+                var response = new LoginResponse(newUser, tokenToSend);
                 return Ok(response);
             }
             catch (ApplicationException exception)
@@ -67,23 +59,29 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult TryLogin([FromBody] AuthenticateRequest request)
         {
-            var foundUser = _userService.GetUserByNameOrEmail(request.Email);
+            var foundUser = _userService.GetUserByUsername(request.Email);
 
             if (foundUser is null) return Unauthorized("No user with that username or email");
             var token = _authService.TryGetToken(request.Email, request.Password);
             if (token is null)
                 return Unauthorized("Wrong credential");
 
-            var response = new LoginResponse
-            {
-                Email = foundUser.Email,
-                FirstName = foundUser.FirstName,
-                LastName = foundUser.LastName,
-                ProfilePictureUrl = foundUser.ProfilePictureUrl,
-                DefaultProfilePictureHex = foundUser.DefaultProfilePictureHex,
-                Token = token
-            };
+            var response = new LoginResponse(foundUser, token);
             return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("google")]
+        public IActionResult TryAuthenticateGoogle([FromBody] GoogleAuthenticateRequest request)
+        {
+            // check if user existed 
+            var existedUser = _userService.GetUserByUsername(request.Email);
+            if (existedUser is null)
+                existedUser = _authService.CreateNewUser("", request.Email, request.FirstName, request.LastName,
+                    request.ProfilePictureUrl, request.DefaultProfilePictureHex);
+            var tokenWithoutPassword = _authService.TryGetTokenWithoutPassword(request.Email);
+            return Ok(new LoginResponse(existedUser, tokenWithoutPassword));
         }
     }
 }

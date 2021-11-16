@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
+using CloudinaryDotNet;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,8 +14,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
-using CloudinaryDotNet;
 
 namespace grade_book_api
 {
@@ -60,14 +59,14 @@ namespace grade_book_api
                 };
             });
             services.AddAuthorization();
-            
-            // set up cloudinary
-            string cloud = Configuration.GetValue<string>("AccountSettings:CloudName");
-            string apiKey = Configuration.GetValue<string>("AccountSettings:ApiKey");
-            string apiSecret = Configuration.GetValue<string>("AccountSettings:ApiSecret");
-            Account cloudinaryAccount = new Account(cloud, apiKey, apiSecret);
 
-            Cloudinary cloudinary = new Cloudinary(cloudinaryAccount);
+            // set up cloudinary
+            var cloud = Configuration.GetValue<string>("AccountSettings:CloudName");
+            var apiKey = Configuration.GetValue<string>("AccountSettings:ApiKey");
+            var apiSecret = Configuration.GetValue<string>("AccountSettings:ApiSecret");
+            var cloudinaryAccount = new Account(cloud, apiKey, apiSecret);
+
+            var cloudinary = new Cloudinary(cloudinaryAccount);
             // set up DI services
 
 

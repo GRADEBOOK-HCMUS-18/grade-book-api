@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure
 {
-    public class CloudinaryPhotoHandler: ICloudPhotoHandler
+    public class CloudinaryPhotoHandler : ICloudPhotoHandler
     {
         private readonly Cloudinary _cloudinary;
         private readonly ILogger<CloudinaryPhotoHandler> _logger;
@@ -19,9 +18,10 @@ namespace Infrastructure
             _cloudinary = cloudinary;
             _logger = logger;
         }
+
         public string Upload(Stream readStream)
         {
-            var uploadConfig = new ImageUploadParams()
+            var uploadConfig = new ImageUploadParams
             {
                 File = new FileDescription("pic", readStream),
                 Tags = "grade-book-backend-api",
@@ -29,9 +29,8 @@ namespace Infrastructure
                 {
                     new EagerTransformation().Width(250).Height(250).Crop("scale")
                 }
-                       
             };
-            var result = _cloudinary.Upload(uploadConfig); 
+            var result = _cloudinary.Upload(uploadConfig);
             _logger.LogCritical(result.StatusCode.ToString());
 
             return result.StatusCode switch
@@ -39,8 +38,6 @@ namespace Infrastructure
                 HttpStatusCode.OK => result.SecureUrl.AbsoluteUri,
                 _ => ""
             };
-
-          
         }
     }
 }

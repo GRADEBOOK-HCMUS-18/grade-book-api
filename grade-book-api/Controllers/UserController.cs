@@ -51,7 +51,6 @@ namespace grade_book_api.Controllers
         [Route("avatar")]
         public IActionResult UpdateUserAvatar(IFormFile image)
         {
-            
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             Console.WriteLine($"Receiving change avatar request from {userId}");
             // validate 
@@ -73,18 +72,15 @@ namespace grade_book_api.Controllers
             _logger.LogInformation($"Received file with extension {fileExtension}");
             // try upload the file 
             string resultUploadUrl;
-            using (Stream stream = image.OpenReadStream())
+            using (var stream = image.OpenReadStream())
             {
                 resultUploadUrl = _userServices.UpdateUserAvatar(userId, stream);
-
             }
 
             if (string.IsNullOrEmpty(resultUploadUrl))
-            {
-                return StatusCode(500,new {Error = "Error happened while uploading picture to cloud"});
-            }
+                return StatusCode(500, new {Error = "Error happened while uploading picture to cloud"});
 
-            return Ok( new { ProfilePictureUrl = resultUploadUrl});
+            return Ok(new {ProfilePictureUrl = resultUploadUrl});
         }
     }
 }

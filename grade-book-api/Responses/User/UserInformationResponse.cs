@@ -2,14 +2,6 @@ namespace grade_book_api.Responses.User
 {
     public class UserInformationResponse
     {
-        public string Email { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string ProfilePictureUrl { get; set; }
-
-        public string DefaultProfilePictureHex { get; set; }
-
-
         public UserInformationResponse(ApplicationCore.Entity.User source)
         {
             Email = source.Email;
@@ -18,5 +10,12 @@ namespace grade_book_api.Responses.User
             ProfilePictureUrl = source.ProfilePictureUrl;
             DefaultProfilePictureHex = source.DefaultProfilePictureHex;
         }
+
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string ProfilePictureUrl { get; set; }
+
+        public string DefaultProfilePictureHex { get; set; }
     }
 }

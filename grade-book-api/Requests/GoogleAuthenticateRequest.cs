@@ -2,14 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace grade_book_api.Requests
 {
-    public class UserRegisterRequest
+    public class GoogleAuthenticateRequest
     {
         [Required] [EmailAddress] public string Email { get; set; }
 
-        [Required]
-        [MaxLength(12)]
-        [MinLength(6)]
-        public string Password { get; set; }
 
         [MaxLength(32)] public string FirstName { get; set; }
 

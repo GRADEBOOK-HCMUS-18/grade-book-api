@@ -8,11 +8,12 @@ namespace ApplicationCore.Services
 {
     public class UserService : IUserServices
     {
+        private readonly ICloudPhotoHandler _cloudPhotoHandler;
         private readonly ILogger<UserService> _logger;
         private readonly IBaseRepository<User> _userRepository;
-        private readonly ICloudPhotoHandler _cloudPhotoHandler;
 
-        public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository, ICloudPhotoHandler cloudPhotoHandler)
+        public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository,
+            ICloudPhotoHandler cloudPhotoHandler)
         {
             _logger = logger;
             _userRepository = userRepository;
@@ -30,10 +31,10 @@ namespace ApplicationCore.Services
             return found;
         }
 
-        public User GetUserByNameOrEmail(string email)
+        public User GetUserByUsername(string email)
         {
             var found = _userRepository.GetFirst(user =>
-                user.Email == email );
+                user.Email == email);
 
             if (found is null)
                 return null;
@@ -56,7 +57,7 @@ namespace ApplicationCore.Services
 
             if (!string.IsNullOrEmpty(newPassword))
             {
-                PasswordHelper.HashPassword(newPassword,out var newSalt, out var newHash);
+                PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
                 found.PasswordHash = newHash;
                 found.PasswordSalt = newSalt;
             }
@@ -72,10 +73,7 @@ namespace ApplicationCore.Services
                 return null;
             var resultUrl = _cloudPhotoHandler.Upload(newPicture);
 
-            if (string.IsNullOrEmpty(resultUrl))
-            {
-                return null;
-            }
+            if (string.IsNullOrEmpty(resultUrl)) return null;
 
             found.ProfilePictureUrl = resultUrl;
             _userRepository.Update(found);

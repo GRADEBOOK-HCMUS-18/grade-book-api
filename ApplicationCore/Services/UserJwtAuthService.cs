@@ -27,7 +27,7 @@ namespace ApplicationCore.Services
         public string TryGetToken(string email, string password)
         {
             var foundUser =
-                _repository.GetFirst(user =>  user.Email == email);
+                _repository.GetFirst(user => user.Email == email);
             if (foundUser is null)
                 return null;
             var success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
@@ -38,10 +38,19 @@ namespace ApplicationCore.Services
             return GenerateJwtToken(foundUser);
         }
 
-        public User CreateNewUser( string password, string email, string firstName, string lastName,
+        public string TryGetTokenWithoutPassword(string email)
+        {
+            var foundUser =
+                _repository.GetFirst(user => user.Email == email);
+            if (foundUser is null)
+                return null; 
+            return GenerateJwtToken(foundUser);
+        }
+
+        public User CreateNewUser(string password, string email, string firstName, string lastName,
             string profilePictureUrl, string defaultProfilePictureHex)
         {
-            var foundUser = _repository.GetFirst(user =>  user.Email == email);
+            var foundUser = _repository.GetFirst(user => user.Email == email);
 
             if (foundUser is not null) throw new ApplicationException("Existed user");
             var userToAdd = new User();
@@ -81,7 +90,7 @@ namespace ApplicationCore.Services
 
         private string GenerateJwtToken(User user)
         {
-            var hourToRefresher = 10;
+            var hourToRefresher = 48;
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("3aacfb02-b67b-4923-8a2d-21a103902b91"));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
