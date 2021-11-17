@@ -1,5 +1,4 @@
 using System.Linq;
-using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
 using grade_book_api.Responses.Class;
@@ -12,20 +11,23 @@ namespace grade_book_api.Controllers
     [ApiController]
     [Authorize]
     [Route("[controller]")]
-    public class ClassController: ControllerBase
+    public class ClassController : ControllerBase
     {
-        private readonly ILogger<ClassController> _logger;
         private readonly IClassService _classService;
+        private readonly ILogger<ClassController> _logger;
 
         public ClassController(ILogger<ClassController> logger, IClassService classService)
         {
             _logger = logger;
             _classService = classService;
         }
+
         [HttpGet]
         public IActionResult GetClassList()
         {
-            return Ok();
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var mainTeacherClasses = _classService.GetAllClassWithUser(userId);
+            return Ok(mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl)));
         }
 
         [HttpGet]
@@ -38,14 +40,13 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult AddNewClass(AddNewClassRequest request)
         {
-            
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
-          
+
             // create new class
 
-            Class newAddClass = _classService.AddNewClass(request.Name, request.StartDate, request.Room,
+            var newAddClass = _classService.AddNewClass(request.Name, request.StartDate, request.Room,
                 request.Description, userId);
-            
+
             return Ok(new ClassShortInformationResponse(newAddClass));
         }
     }

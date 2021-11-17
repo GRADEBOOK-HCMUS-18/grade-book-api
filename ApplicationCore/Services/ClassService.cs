@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using ApplicationCore.Entity;
@@ -28,6 +29,16 @@ namespace ApplicationCore.Services
         public Class GetClassDetail(int classId)
         {
             throw new NotImplementedException();
+        }
+
+        public List<Class> GetAllClassWithUser(int userId)
+        {
+            var foundUser = _userRepository.GetFirst(user => user.Id == userId);
+            if (foundUser is null)
+                throw new ApplicationException("User does not exists");
+
+            var mainTeacherClasses = _classRepository.List(cl => cl.MainTeacher.Id == userId, null, "MainTeacher");
+            return mainTeacherClasses.ToList();
         }
 
         public Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId)
