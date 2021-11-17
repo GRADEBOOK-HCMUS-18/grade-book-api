@@ -46,7 +46,7 @@ namespace ApplicationCore.Services
         {
             var foundUser =
                 _userRepository.GetFirst(user => user.Id == userId, 
-                    user => user.Include(u => u.ClassTeachers).ThenInclude(c => c.Class));
+                    user => user.Include(u => u.ClassTeachers).ThenInclude(c => c.Class).ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)
@@ -59,7 +59,7 @@ namespace ApplicationCore.Services
         {
             var foundUser =
                 _userRepository.GetFirst(user => user.Id == userId, 
-                    user => user.Include(u => u.ClassStudents).ThenInclude(c => c.Class));
+                    user => user.Include(u => u.ClassStudents).ThenInclude(c => c.Class).ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)

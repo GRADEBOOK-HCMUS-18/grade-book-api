@@ -1,19 +1,19 @@
 using System;
+using grade_book_api.Responses.User;
 
 namespace grade_book_api.Responses.Class
 {
     public class ClassShortInformationResponse
     {
-        public ClassShortInformationResponse(ApplicationCore.Entity.Class inputClass, string roleOfCurrentUser)
+        public ClassShortInformationResponse(ApplicationCore.Entity.Class inputClass, string roleOfCurrentUser, ApplicationCore.Entity.User mainTeacher)
         {
             Name = inputClass.Name;
             StartDate = inputClass.StartDate;
             Room = inputClass.Room;
             Description = inputClass.Description;
-            InviteStringStudent = inputClass.InviteStringStudent;
-            InviteStringTeacher = inputClass.InviteStringTeacher;
             Id = inputClass.Id;
             RoleOfCurrentUser = roleOfCurrentUser;
+            MainTeacher = new UserInformationResponse(mainTeacher);
         }
 
         public int Id { get; set; }
@@ -22,7 +22,7 @@ namespace grade_book_api.Responses.Class
         public DateTime StartDate { get; set; }
         public string Room { get; set; }
         public string Description { get; set; }
-        public string InviteStringTeacher { get; set; }
-        public string InviteStringStudent { get; set; }
+
+        public UserInformationResponse MainTeacher { get; set; }
     }
 }

@@ -34,9 +34,9 @@ namespace grade_book_api.Controllers
                 var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
                 var subTeacherClasses = _classService.GetAllClassWithUserBeingSubTeacher(userId);
                 var studentClasses = _classService.GetAllClassWithUserBeingStudent(userId);
-                var classesResponse = mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "teacher")).ToList();
-                classesResponse.AddRange(subTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "subteacher")));
-                classesResponse.AddRange(studentClasses.Select(cl => new ClassShortInformationResponse(cl, "student")));
+                var classesResponse = mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "teacher", cl.MainTeacher)).ToList();
+                classesResponse.AddRange(subTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "subteacher", cl.MainTeacher)));
+                classesResponse.AddRange(studentClasses.Select(cl => new ClassShortInformationResponse(cl, "student",cl.MainTeacher)));
                 
                 return Ok(classesResponse);
 
@@ -64,7 +64,7 @@ namespace grade_book_api.Controllers
             var newAddClass = _classService.AddNewClass(request.Name, request.StartDate, request.Room,
                 request.Description, userId);
 
-            return Ok(new ClassShortInformationResponse(newAddClass, "teacher"));
+            return Ok(new ClassShortInformationResponse(newAddClass, "teacher",newAddClass.MainTeacher));
         }
 
         [HttpPost]
