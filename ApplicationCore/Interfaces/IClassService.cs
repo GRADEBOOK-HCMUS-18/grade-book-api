@@ -7,7 +7,9 @@ namespace ApplicationCore.Interfaces
     public interface IClassService
     {
         Class GetClassDetail(int classId);
-        List<Class> GetAllClassWithUser(int userId);
+        List<Class> GetAllClassWithUserBeingMainTeacher(int userId);
+        List<Class> GetAllClassWithUserBeingSubTeacher(int userId);
+        List<Class> GetAllClassWithUserBeingStudent(int userId);
         Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId);
         void AddStudentToClass(int classId, int studentId);
     }

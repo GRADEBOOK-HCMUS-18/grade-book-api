@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
 using grade_book_api.Responses.Class;
@@ -27,8 +29,22 @@ namespace grade_book_api.Controllers
         public IActionResult GetClassList()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
-            var mainTeacherClasses = _classService.GetAllClassWithUser(userId);
-            return Ok(mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl)));
+            try
+            {
+                var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
+                var subTeacherClasses = _classService.GetAllClassWithUserBeingSubTeacher(userId);
+                var studentClasses = _classService.GetAllClassWithUserBeingStudent(userId);
+                var classesResponse = mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "teacher")).ToList();
+                classesResponse.AddRange(subTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "subteacher")));
+                classesResponse.AddRange(studentClasses.Select(cl => new ClassShortInformationResponse(cl, "student")));
+                
+                return Ok(classesResponse);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -48,7 +64,7 @@ namespace grade_book_api.Controllers
             var newAddClass = _classService.AddNewClass(request.Name, request.StartDate, request.Room,
                 request.Description, userId);
 
-            return Ok(new ClassShortInformationResponse(newAddClass));
+            return Ok(new ClassShortInformationResponse(newAddClass, "teacher"));
         }
 
         [HttpPost]

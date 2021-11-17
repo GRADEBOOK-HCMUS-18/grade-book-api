@@ -11,7 +11,8 @@ namespace ApplicationCore.Interfaces
     {
         TEntity GetById(int id);
 
-        TEntity GetFirst(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
+        TEntity GetFirst(Expression<Func<TEntity, bool>> predicate,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 
         void Delete(TEntity entity);
 
@@ -25,7 +26,7 @@ namespace ApplicationCore.Interfaces
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = ""
         );
-        
+
         IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null
