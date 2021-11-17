@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Infrastructure
 {
@@ -22,9 +23,16 @@ namespace Infrastructure
             return _dbSet.Set<TEntity>().FirstOrDefault(obj => obj.Id == id);
         }
 
-        public TEntity GetFirst(Expression<Func<TEntity, bool>> predicate)
+        public TEntity GetFirst(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
-            return _dbSet.Set<TEntity>().FirstOrDefault(predicate);
+            if (include is null)
+            {
+                return _dbSet.Set<TEntity>().FirstOrDefault(predicate);
+            }
+
+            var queryable = include(_dbSet.Set<TEntity>());
+
+            return queryable.FirstOrDefault(predicate);
         }
 
         public void Delete(TEntity entity)
@@ -75,6 +83,20 @@ namespace Infrastructure
                 query = includes
                     .Aggregate(query, (current, property) => current.Include(property));
 
+            if (orderBy is not null) query = orderBy(query);
+
+            return query.ToList();
+        }
+
+        public IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
+        {
+            IQueryable<TEntity> query = _dbSet.Set<TEntity>();
+            if (filter is not null) query = query.Where(filter);
+
+            if (include is not null)
+            {
+                query = include(query);
+            }
             if (orderBy is not null) query = orderBy(query);
 
             return query.ToList();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ApplicationCore.Services
@@ -13,6 +14,7 @@ namespace ApplicationCore.Services
         private readonly ILogger<ClassService> _logger;
         private readonly IBaseRepository<Class> _classRepository;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<ClassStudents> _classStudentsRepository;
 
         private string GenerateRandomLetterString()
         {
@@ -20,11 +22,16 @@ namespace ApplicationCore.Services
             return resultGuid.Substring(resultGuid.Length - 12); 
         }
 
-        public ClassService(ILogger<ClassService> logger, IBaseRepository<Class> classRepository, IBaseRepository<User> userRepository)
+        public ClassService(ILogger<ClassService> logger, 
+            IBaseRepository<Class> classRepository, 
+            IBaseRepository<User> userRepository,
+            IBaseRepository<ClassStudents> classStudentsRepository)
         {
             _logger = logger;
             _classRepository = classRepository;
             _userRepository = userRepository;
+            _classStudentsRepository = classStudentsRepository;
+
         }
         public Class GetClassDetail(int classId)
         {
@@ -37,7 +44,8 @@ namespace ApplicationCore.Services
             if (foundUser is null)
                 throw new ApplicationException("User does not exists");
 
-            var mainTeacherClasses = _classRepository.List(cl => cl.MainTeacher.Id == userId, null, "MainTeacher");
+            var mainTeacherClasses = 
+                _classRepository.List(cl => cl.MainTeacher == foundUser, null, "MainTeacher");
             return mainTeacherClasses.ToList();
         }
 
@@ -63,7 +71,41 @@ namespace ApplicationCore.Services
 
         public void AddStudentToClass(int classId, int studentId)
         {
-            throw new NotImplementedException();
+            var foundUser = _userRepository.GetFirst(user => user.Id == studentId,
+                user => user.Include(u => u.ClassStudents).Include(u => u.ClassTeachers));
+            if (foundUser is null)
+                throw new ApplicationException("User does not exist");
+            var foundClass = _classRepository.GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.MainTeacher));
+            if (foundClass.MainTeacher == foundUser)
+            {
+                throw new ApplicationException("User is currently the main teacher of this class");
+            }
+            if (foundClass is null)
+                throw new ApplicationException("Class does not exists");
+
+            if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
+            {
+                throw new ApplicationException("User already a student in class");
+            }
+
+            if (foundUser.ClassTeachers.FirstOrDefault(c => c.ClassId == classId) is not null)
+            {
+                throw new ApplicationException("User is currently a teacher in class"); 
+            }
+           
+
+            var newClassStudentRecord = new ClassStudents()
+            {
+                Class = foundClass,
+                ClassId = foundClass.Id,
+                Student = foundUser,
+                StudentId = foundUser.Id
+            };
+
+            _classStudentsRepository.Insert(newClassStudentRecord);
+
+
+
         }
     }
 }

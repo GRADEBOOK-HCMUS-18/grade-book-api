@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
@@ -48,6 +49,21 @@ namespace grade_book_api.Controllers
                 request.Description, userId);
 
             return Ok(new ClassShortInformationResponse(newAddClass));
+        }
+
+        [HttpPost]
+        [Route("student")]
+        public IActionResult AddStudentToClass([FromBody] AddStudentToClassRequest request)
+        {
+            try
+            {
+                _classService.AddStudentToClass(request.ClassId, request.StudentId);
+                return Ok();
+            }
+            catch (ApplicationException ex )
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

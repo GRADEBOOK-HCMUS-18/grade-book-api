@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using ApplicationCore.Entity;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ApplicationCore.Interfaces
 {
@@ -10,7 +11,7 @@ namespace ApplicationCore.Interfaces
     {
         TEntity GetById(int id);
 
-        TEntity GetFirst(Expression<Func<TEntity, bool>> predicate);
+        TEntity GetFirst(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 
         void Delete(TEntity entity);
 
@@ -23,6 +24,11 @@ namespace ApplicationCore.Interfaces
         IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = ""
+        );
+        
+        IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null
         );
     }
 }
