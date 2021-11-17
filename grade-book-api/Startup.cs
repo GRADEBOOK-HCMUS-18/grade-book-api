@@ -72,6 +72,7 @@ namespace grade_book_api
 
             services.AddScoped<IUserJwtAuthService, UserJwtAuthService>();
             services.AddScoped<IUserServices, UserService>();
+            services.AddScoped<IClassService, ClassService>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(EfRepository<>));
             services.AddScoped<ICloudPhotoHandler, CloudinaryPhotoHandler>();
             services.AddSingleton(cloudinary);
