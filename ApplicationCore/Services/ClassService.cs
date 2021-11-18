@@ -28,7 +28,13 @@ namespace ApplicationCore.Services
 
         public Class GetClassDetail(int classId)
         {
-            throw new NotImplementedException();
+            var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
+                cl => cl.Include(c => c.MainTeacher)
+                    .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student)
+                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher));
+            if (foundClass is null)
+                return null;
+            return foundClass;
         }
 
         public List<Class> GetAllClassWithUserBeingMainTeacher(int userId)

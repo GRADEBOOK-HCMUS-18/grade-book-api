@@ -17,12 +17,35 @@ namespace grade_book_api.Controllers
     public class ClassController : ControllerBase
     {
         private readonly IClassService _classService;
+        private readonly IUserServices _userServices;
         private readonly ILogger<ClassController> _logger;
 
-        public ClassController(ILogger<ClassController> logger, IClassService classService)
+        public ClassController(ILogger<ClassController> logger, IClassService classService, IUserServices userServices)
         {
             _logger = logger;
             _classService = classService;
+            _userServices = userServices;
+        }
+        [HttpGet]
+        [Route("{classId}")]
+        public IActionResult GetClassDetail(int classId)
+        {
+            
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            try
+            {
+                
+                bool isTeacher = _userServices.IsUserTeacherInClass(userId, classId);
+                var foundClass = _classService.GetClassDetail(classId);
+                var response = new ClassDetailInformationResponse(foundClass, isTeacher);
+
+                return Ok(response); 
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet]
@@ -47,12 +70,7 @@ namespace grade_book_api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("classId")]
-        public IActionResult GetClassDetail(int classId)
-        {
-            return Ok();
-        }
+      
 
         [HttpPost]
         public IActionResult AddNewClass(AddNewClassRequest request)

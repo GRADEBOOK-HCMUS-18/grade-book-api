@@ -1,6 +1,9 @@
+using System;
 using System.IO;
+using System.Linq;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SharedKernel;
 
@@ -11,13 +14,15 @@ namespace ApplicationCore.Services
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
         private readonly ILogger<UserService> _logger;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<Class> _classRepository;   
 
         public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository,
-            ICloudPhotoHandler cloudPhotoHandler)
+            ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository)
         {
             _logger = logger;
             _userRepository = userRepository;
             _cloudPhotoHandler = cloudPhotoHandler;
+            _classRepository = classRepository;
         }
 
         public User GetUserById(int id)
@@ -40,6 +45,31 @@ namespace ApplicationCore.Services
                 return null;
 
             return found;
+        }
+
+        public bool IsUserTeacherInClass(int userId, int classId)
+        {
+            var foundClass =
+                _classRepository
+                    .GetFirst(cl => cl.Id == classId, 
+                        cl => cl.Include(c => c.MainTeacher));
+            var foundUser = _userRepository.GetFirst(user => user.Id == userId,
+                user => user.Include(u => u.ClassStudents)
+                    .Include(u => u.ClassTeachers));
+            
+            if(foundClass.MainTeacher == foundUser)
+            {
+                return true;
+            }
+
+            if (foundUser.ClassTeachers.FirstOrDefault(c => c.ClassId == classId) is not null)
+                return true;
+            if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
+                return false;
+            throw new ApplicationException("User is not a member of this class");
+
+
+
         }
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
