@@ -12,5 +12,6 @@ namespace ApplicationCore.Interfaces
         List<Class> GetAllClassWithUserBeingStudent(int userId);
         Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId);
         void AddStudentToClass(int classId, int studentId);
+        void AddTeacherToClass(int classId, int teacherId);
     }
 }

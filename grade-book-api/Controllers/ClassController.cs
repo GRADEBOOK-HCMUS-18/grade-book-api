@@ -99,5 +99,20 @@ namespace grade_book_api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("teacher")]
+        public IActionResult AddTeacherToClass([FromBody] AddTeacherToClassRequest request)
+        {
+            try
+            {
+                _classService.AddTeacherToClass(request.ClassId,request.TeacherId);
+                return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

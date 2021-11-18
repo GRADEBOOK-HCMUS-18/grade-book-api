@@ -47,7 +47,6 @@ namespace grade_book_api.Controllers
         }
 
         [HttpPut]
-        [AllowAnonymous]
         [Route("avatar")]
         public IActionResult UpdateUserAvatar(IFormFile image)
         {
