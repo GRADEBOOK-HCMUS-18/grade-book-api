@@ -1,6 +1,5 @@
-using ApplicationCore.Entity;
+using System.Linq;
 using ApplicationCore.Interfaces;
-using grade_book_api.Responses.Class;
 using grade_book_api.Responses.Invitation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,28 +10,31 @@ namespace grade_book_api.Controllers
     [Route("[controller]")]
     public class InviteController : ControllerBase
     {
-        private readonly ILogger<InviteController> _logger;
         private readonly IInvitationService _invitationService;
+        private readonly ILogger<InviteController> _logger;
+        private readonly IUserServices _userService;
 
-        public InviteController(ILogger<InviteController> logger, IInvitationService invitationService)
+        public InviteController(ILogger<InviteController> logger, IInvitationService invitationService,
+            IUserServices userServices)
         {
             _logger = logger;
             _invitationService = invitationService;
+            _userService = userServices;
         }
-        
+
         [HttpGet]
         [Route("{inviteString}")]
         public IActionResult GetInviteInformation([FromRoute] string inviteString)
         {
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             _logger.LogInformation($"Received invitation information request for {inviteString}");
-            Class foundClass = _invitationService.GetClassFromInvitation(inviteString);
-            if (foundClass is null)
-            {
-                return NotFound("Invitation string does not exist");
-            }
+            var foundClass = _invitationService.GetClassFromInvitation(inviteString);
+            if (foundClass is null) return NotFound("Invitation string does not exist");
 
-            bool isTeacherInvite = inviteString == foundClass.InviteStringTeacher;
-            var response = new InvitationInformationResponse(foundClass, isTeacherInvite);
+            var userRoleInClass = _userService.GetUserRoleInClass(userId, foundClass.Id);
+
+            var isTeacherInvite = inviteString == foundClass.InviteStringTeacher;
+            var response = new InvitationInformationResponse(foundClass, userRoleInClass, isTeacherInvite);
             return Ok(response);
         }
 

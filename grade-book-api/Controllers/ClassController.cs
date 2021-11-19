@@ -32,12 +32,12 @@ namespace grade_book_api.Controllers
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             try
             {
+                var foundClass = _classService.GetClassDetail(classId);
                 var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
                 if (userRoleInClass == 0)
                 {
                     return BadRequest("User not a member in class");
                 }
-                var foundClass = _classService.GetClassDetail(classId);
                 var response = new ClassDetailInformationResponse(foundClass, userRoleInClass == 1);
 
                 return Ok(response);

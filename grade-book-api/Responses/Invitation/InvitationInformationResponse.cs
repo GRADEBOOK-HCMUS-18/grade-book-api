@@ -4,15 +4,31 @@ namespace grade_book_api.Responses.Invitation
 {
     public class InvitationInformationResponse
     {
-        
+
+        public bool IsAlreadyInClass { get; set; }
+
+        public string CurrentRoleInClass { get; set; }
         public bool IsTeacherInvitation { get; set; }
-        public  ClassShortInformationResponse ClassInformation { get; set; }
+        public ClassShortInformationResponse ClassInformation { get; set; }
 
 
-        public InvitationInformationResponse(ApplicationCore.Entity.Class inputClass, bool isTeacherInvitation)
+
+        public InvitationInformationResponse(ApplicationCore.Entity.Class inputClass, int userRoleInClass,
+            bool isTeacherInvitation)
         {
-            ClassInformation = new ClassShortInformationResponse(inputClass, "none", inputClass.MainTeacher);
+            CurrentRoleInClass = userRoleInClass switch
+            {
+                1 => "teacher",
+                0 => "none",
+                -1 => "student",
+                _ => "none"
+
+            };
+            ClassInformation =
+                new ClassShortInformationResponse(inputClass, CurrentRoleInClass, inputClass.MainTeacher);
             IsTeacherInvitation = isTeacherInvitation;
+            IsAlreadyInClass = userRoleInClass != 0;
+
         }
     }
 }
