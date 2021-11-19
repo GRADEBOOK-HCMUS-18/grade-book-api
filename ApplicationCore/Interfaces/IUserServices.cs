@@ -7,7 +7,7 @@ namespace ApplicationCore.Interfaces
     {
         public User GetUserById(int id);
         public User GetUserByUsername(string email);
-        public bool IsUserTeacherInClass(int userId, int classId); 
+        public int GetUserRoleInClass(int userId, int classId);
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
             string newPassword, string newEmail);

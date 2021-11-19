@@ -23,12 +23,10 @@ namespace Infrastructure
             return _dbSet.Set<TEntity>().FirstOrDefault(obj => obj.Id == id);
         }
 
-        public TEntity GetFirst(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
+        public TEntity GetFirst(Expression<Func<TEntity, bool>> predicate,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
-            if (include is null)
-            {
-                return _dbSet.Set<TEntity>().FirstOrDefault(predicate);
-            }
+            if (include is null) return _dbSet.Set<TEntity>().FirstOrDefault(predicate);
 
             var queryable = include(_dbSet.Set<TEntity>());
 
@@ -88,15 +86,14 @@ namespace Infrastructure
             return query.ToList();
         }
 
-        public IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
+        public IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
         {
             IQueryable<TEntity> query = _dbSet.Set<TEntity>();
             if (filter is not null) query = query.Where(filter);
 
-            if (include is not null)
-            {
-                query = include(query);
-            }
+            if (include is not null) query = include(query);
             if (orderBy is not null) query = orderBy(query);
 
             return query.ToList();

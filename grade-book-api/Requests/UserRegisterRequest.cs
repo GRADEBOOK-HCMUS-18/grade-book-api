@@ -6,9 +6,7 @@ namespace grade_book_api.Requests
     {
         [Required] [EmailAddress] public string Email { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
+        [Required] [MinLength(6)] public string Password { get; set; }
 
         [MaxLength(32)] public string FirstName { get; set; }
 

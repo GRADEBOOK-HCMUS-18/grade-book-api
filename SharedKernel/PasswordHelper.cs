@@ -8,7 +8,7 @@ namespace SharedKernel
     {
         public static void HashPassword(string inputPassword, out byte[] salt, out byte[] hash)
         {
-            if (inputPassword is null )
+            if (inputPassword is null)
                 throw new ArgumentException("Password is undefied");
 
             using (var randomhash = new HMACSHA512())

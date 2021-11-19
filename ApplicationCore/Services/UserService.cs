@@ -11,10 +11,10 @@ namespace ApplicationCore.Services
 {
     public class UserService : IUserServices
     {
+        private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
         private readonly ILogger<UserService> _logger;
         private readonly IBaseRepository<User> _userRepository;
-        private readonly IBaseRepository<Class> _classRepository;   
 
         public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository,
             ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository)
@@ -47,29 +47,24 @@ namespace ApplicationCore.Services
             return found;
         }
 
-        public bool IsUserTeacherInClass(int userId, int classId)
+        // 1: teacher, 0: not a member, -1: student.
+        public int GetUserRoleInClass(int userId, int classId)
         {
             var foundClass =
                 _classRepository
-                    .GetFirst(cl => cl.Id == classId, 
+                    .GetFirst(cl => cl.Id == classId,
                         cl => cl.Include(c => c.MainTeacher));
             var foundUser = _userRepository.GetFirst(user => user.Id == userId,
                 user => user.Include(u => u.ClassStudents)
                     .Include(u => u.ClassTeachers));
-            
-            if(foundClass.MainTeacher == foundUser)
-            {
-                return true;
-            }
+
+            if (foundClass.MainTeacher == foundUser) return 1;
 
             if (foundUser.ClassTeachers.FirstOrDefault(c => c.ClassId == classId) is not null)
-                return true;
+                return 1;
             if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
-                return false;
-            throw new ApplicationException("User is not a member of this class");
-
-
-
+                return -1;
+            return 0;
         }
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,

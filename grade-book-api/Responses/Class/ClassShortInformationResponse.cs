@@ -5,7 +5,8 @@ namespace grade_book_api.Responses.Class
 {
     public class ClassShortInformationResponse
     {
-        public ClassShortInformationResponse(ApplicationCore.Entity.Class inputClass, string roleOfCurrentUser, ApplicationCore.Entity.User mainTeacher)
+        public ClassShortInformationResponse(ApplicationCore.Entity.Class inputClass, string roleOfCurrentUser,
+            ApplicationCore.Entity.User mainTeacher)
         {
             Name = inputClass.Name;
             StartDate = inputClass.StartDate;

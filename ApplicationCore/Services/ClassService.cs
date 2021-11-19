@@ -54,21 +54,22 @@ namespace ApplicationCore.Services
         public List<Class> GetAllClassWithUserBeingSubTeacher(int userId)
         {
             var foundUser =
-                _userRepository.GetFirst(user => user.Id == userId, 
-                    user => user.Include(u => u.ClassTeachers).ThenInclude(c => c.Class).ThenInclude(cl => cl.MainTeacher));
+                _userRepository.GetFirst(user => user.Id == userId,
+                    user => user.Include(u => u.ClassTeachers).ThenInclude(c => c.Class)
+                        .ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)
                 throw new ApplicationException("User does not exists");
             return foundUser.ClassTeachers.Select(ct => ct.Class).ToList();
-
         }
 
         public List<Class> GetAllClassWithUserBeingStudent(int userId)
         {
             var foundUser =
-                _userRepository.GetFirst(user => user.Id == userId, 
-                    user => user.Include(u => u.ClassStudents).ThenInclude(c => c.Class).ThenInclude(cl => cl.MainTeacher));
+                _userRepository.GetFirst(user => user.Id == userId,
+                    user => user.Include(u => u.ClassStudents).ThenInclude(c => c.Class)
+                        .ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)
@@ -134,6 +135,7 @@ namespace ApplicationCore.Services
             };
             _classTeacherRepository.Insert(newClassTeacherRecord);
         }
+
         private User GetUserWithClassInformation(int studentId)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == studentId,

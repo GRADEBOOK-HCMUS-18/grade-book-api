@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
 using grade_book_api.Responses.Class;
@@ -17,8 +15,8 @@ namespace grade_book_api.Controllers
     public class ClassController : ControllerBase
     {
         private readonly IClassService _classService;
-        private readonly IUserServices _userServices;
         private readonly ILogger<ClassController> _logger;
+        private readonly IUserServices _userServices;
 
         public ClassController(ILogger<ClassController> logger, IClassService classService, IUserServices userServices)
         {
@@ -26,26 +24,28 @@ namespace grade_book_api.Controllers
             _classService = classService;
             _userServices = userServices;
         }
+
         [HttpGet]
         [Route("{classId}")]
         public IActionResult GetClassDetail(int classId)
         {
-            
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             try
             {
-                
-                bool isTeacher = _userServices.IsUserTeacherInClass(userId, classId);
+                var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+                if (userRoleInClass == 0)
+                {
+                    return BadRequest("User not a member in class");
+                }
                 var foundClass = _classService.GetClassDetail(classId);
-                var response = new ClassDetailInformationResponse(foundClass, isTeacher);
+                var response = new ClassDetailInformationResponse(foundClass, userRoleInClass == 1);
 
-                return Ok(response); 
+                return Ok(response);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpGet]
@@ -57,12 +57,14 @@ namespace grade_book_api.Controllers
                 var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
                 var subTeacherClasses = _classService.GetAllClassWithUserBeingSubTeacher(userId);
                 var studentClasses = _classService.GetAllClassWithUserBeingStudent(userId);
-                var classesResponse = mainTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "teacher", cl.MainTeacher)).ToList();
-                classesResponse.AddRange(subTeacherClasses.Select(cl => new ClassShortInformationResponse(cl, "subteacher", cl.MainTeacher)));
-                classesResponse.AddRange(studentClasses.Select(cl => new ClassShortInformationResponse(cl, "student",cl.MainTeacher)));
-                
-                return Ok(classesResponse);
+                var classesResponse = mainTeacherClasses
+                    .Select(cl => new ClassShortInformationResponse(cl, "teacher", cl.MainTeacher)).ToList();
+                classesResponse.AddRange(subTeacherClasses.Select(cl =>
+                    new ClassShortInformationResponse(cl, "subteacher", cl.MainTeacher)));
+                classesResponse.AddRange(studentClasses.Select(cl =>
+                    new ClassShortInformationResponse(cl, "student", cl.MainTeacher)));
 
+                return Ok(classesResponse);
             }
             catch (Exception ex)
             {
@@ -70,7 +72,6 @@ namespace grade_book_api.Controllers
             }
         }
 
-      
 
         [HttpPost]
         public IActionResult AddNewClass(AddNewClassRequest request)
@@ -82,7 +83,7 @@ namespace grade_book_api.Controllers
             var newAddClass = _classService.AddNewClass(request.Name, request.StartDate, request.Room,
                 request.Description, userId);
 
-            return Ok(new ClassShortInformationResponse(newAddClass, "teacher",newAddClass.MainTeacher));
+            return Ok(new ClassShortInformationResponse(newAddClass, "teacher", newAddClass.MainTeacher));
         }
 
         [HttpPost]
@@ -94,7 +95,7 @@ namespace grade_book_api.Controllers
                 _classService.AddStudentToClass(request.ClassId, request.StudentId);
                 return Ok();
             }
-            catch (ApplicationException ex )
+            catch (ApplicationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -106,7 +107,7 @@ namespace grade_book_api.Controllers
         {
             try
             {
-                _classService.AddTeacherToClass(request.ClassId,request.TeacherId);
+                _classService.AddTeacherToClass(request.ClassId, request.TeacherId);
                 return Ok();
             }
             catch (ApplicationException ex)
