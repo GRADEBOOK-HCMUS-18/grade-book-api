@@ -30,7 +30,12 @@ namespace grade_book_api.Controllers
         public IActionResult GetUserInformation()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
-            return BadRequest();
+            _logger.LogInformation($"Received get user inf by id {userId}");
+            var foundUser = _userServices.GetUserById(userId);
+            if (foundUser is null)
+                return NotFound("User not found");
+            var response = new UserDetailedInformationResponse(foundUser);
+            return Ok(response);
         }
 
         [HttpPut]
