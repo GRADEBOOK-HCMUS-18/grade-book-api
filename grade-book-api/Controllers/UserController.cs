@@ -69,6 +69,7 @@ namespace grade_book_api.Controllers
                 "image/png"
             };
             if (!allowedContentType.Contains(image.ContentType.ToLower()))
+                _logger.LogError("Throw bad request because of insufficent content type");
                 return BadRequest("Content type is not image");
 
             var fileExtension = Path.GetExtension(image.FileName);
