@@ -14,6 +14,8 @@ namespace grade_book_api.Responses.Class
             Description = inputClass.Description;
             Id = inputClass.Id;
             RoleOfCurrentUser = roleOfCurrentUser;
+            InviteStringTeacher = roleOfCurrentUser != "student" ? inputClass.InviteStringTeacher : "";
+            InviteStringStudent = roleOfCurrentUser != "student" ? inputClass.InviteStringStudent : "";
             MainTeacher = new UserInformationResponse(mainTeacher);
         }
 
@@ -23,6 +25,8 @@ namespace grade_book_api.Responses.Class
         public DateTime StartDate { get; set; }
         public string Room { get; set; }
         public string Description { get; set; }
+        public string InviteStringTeacher {get;set;}
+        public string InviteStringStudent {get;set;}
 
         public UserInformationResponse MainTeacher { get; set; }
     }
