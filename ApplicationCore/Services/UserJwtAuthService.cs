@@ -63,6 +63,7 @@ namespace ApplicationCore.Services
 
             userToAdd.PasswordSalt = newPasswordSalt;
             userToAdd.PasswordHash = newPasswordHash;
+            userToAdd.IsPasswordNotSet = String.IsNullOrEmpty(password);
 
             _repository.Insert(userToAdd);
 

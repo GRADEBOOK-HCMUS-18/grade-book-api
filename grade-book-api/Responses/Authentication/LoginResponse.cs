@@ -10,6 +10,7 @@ namespace grade_book_api.Responses.Authentication
             LastName = user.LastName;
             ProfilePictureUrl = user.ProfilePictureUrl;
             DefaultProfilePictureHex = user.DefaultProfilePictureHex;
+            IsPasswordNotSet = user.IsPasswordNotSet;
         }
 
         public string Token { get; set; }
@@ -19,5 +20,6 @@ namespace grade_book_api.Responses.Authentication
         public string ProfilePictureUrl { get; set; }
 
         public string DefaultProfilePictureHex { get; set; }
+        public bool IsPasswordNotSet { get; set; }
     }
 }

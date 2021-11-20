@@ -33,7 +33,7 @@ namespace grade_book_api
             services.AddDbContext<AppDbContext>(
                 builder =>
                     builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
-                        .LogTo(Console.WriteLine, LogLevel.Information)
+                       // .LogTo(Console.WriteLine, LogLevel.Information)
             );
             services.AddSwaggerGen(c =>
             {

@@ -29,7 +29,7 @@ namespace grade_book_api.Responses.Class
         public string Description { get; set; }
         public string InviteStringTeacher { get; set; }
         public string InviteStringStudent { get; set; }
-        
+
         public bool IsTeacher { get; set; }
 
         public UserInformationResponse MainTeacher { get; set; }

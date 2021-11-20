@@ -14,6 +14,7 @@ namespace ApplicationCore.Entity
         public string ProfilePictureUrl { get; set; }
         public string DefaultProfilePictureHex { get; set; }
         public string StudentIdentification { get; set; }
+        public bool IsPasswordNotSet { get; set; } = false;
         public IList<ClassStudents> ClassStudents { get; set; } = new List<ClassStudents>();
         public IList<ClassTeachers> ClassTeachers { get; set; } = new List<ClassTeachers>();
     }

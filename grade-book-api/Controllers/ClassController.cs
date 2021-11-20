@@ -34,10 +34,7 @@ namespace grade_book_api.Controllers
             {
                 var foundClass = _classService.GetClassDetail(classId);
                 var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-                if (userRoleInClass == 0)
-                {
-                    return BadRequest("User not a member in class");
-                }
+                if (userRoleInClass == 0) return BadRequest("User not a member in class");
                 var response = new ClassDetailInformationResponse(foundClass, userRoleInClass == 1);
 
                 return Ok(response);

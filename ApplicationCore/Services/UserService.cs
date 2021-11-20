@@ -85,6 +85,7 @@ namespace ApplicationCore.Services
                 PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
                 found.PasswordHash = newHash;
                 found.PasswordSalt = newSalt;
+                found.IsPasswordNotSet = false;
             }
 
             var result = _userRepository.Update(found);
