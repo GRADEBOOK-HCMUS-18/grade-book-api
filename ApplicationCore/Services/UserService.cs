@@ -75,7 +75,6 @@ namespace ApplicationCore.Services
 
             if (!string.IsNullOrEmpty(newFirstname)) found.FirstName = newFirstname;
             if (!string.IsNullOrEmpty(newLastname)) found.LastName = newLastname;
-            // TODO: throw if student Id already exists and belong to another stundet
 
             if (!string.IsNullOrEmpty(newStudentIdentification))
             {
