@@ -10,8 +10,9 @@ namespace ApplicationCore.Interfaces
         public int GetUserRoleInClass(int userId, int classId);
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
-            string newPassword, string newEmail);
+            string newEmail);
 
+        public User UpdateUserPassword(int userId, string oldPassword, string newPassword);
         public string UpdateUserAvatar(int id, Stream newPicture);
     }
 }

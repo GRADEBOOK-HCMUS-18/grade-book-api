@@ -1,7 +1,6 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
@@ -30,7 +29,8 @@ namespace ApplicationCore.Services
                 _repository.GetFirst(user => user.Email == email);
             if (foundUser is null)
                 return null;
-            var success = CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
+            var success = PasswordHelper
+                .CheckPasswordHash(password, foundUser.PasswordHash, foundUser.PasswordSalt);
 
             if (!success)
                 return null;
@@ -59,35 +59,18 @@ namespace ApplicationCore.Services
             userToAdd.LastName = lastName;
             userToAdd.ProfilePictureUrl = profilePictureUrl;
             userToAdd.DefaultProfilePictureHex = defaultProfilePictureHex;
-            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
 
+            userToAdd.IsPasswordNotSet = string.IsNullOrEmpty(password);
+            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
             userToAdd.PasswordSalt = newPasswordSalt;
             userToAdd.PasswordHash = newPasswordHash;
-            userToAdd.IsPasswordNotSet = String.IsNullOrEmpty(password);
+
 
             _repository.Insert(userToAdd);
 
             return userToAdd;
         }
 
-
-        private bool CheckPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-        {
-            if (string.IsNullOrEmpty(password))
-                throw new ArgumentException("Input password is empty");
-            using (var hmacsha512 = new HMACSHA512(storedSalt))
-            {
-                var passwordHashToCheck = hmacsha512.ComputeHash(Encoding.UTF8.GetBytes(password));
-                for (var i = 0; i < passwordHashToCheck.Length; i++)
-                    if (passwordHashToCheck[i] != storedHash[i])
-                    {
-                        Console.WriteLine("Wrong password");
-                        return false;
-                    }
-            }
-
-            return true;
-        }
 
         private string GenerateJwtToken(User user)
         {

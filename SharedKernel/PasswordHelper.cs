@@ -17,5 +17,23 @@ namespace SharedKernel
                 hash = randomhash.ComputeHash(Encoding.UTF8.GetBytes(inputPassword));
             }
         }
+
+        public static bool CheckPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentException("Input password is empty");
+            using (var hmacsha512 = new HMACSHA512(storedSalt))
+            {
+                var passwordHashToCheck = hmacsha512.ComputeHash(Encoding.UTF8.GetBytes(password));
+                for (var i = 0; i < passwordHashToCheck.Length; i++)
+                    if (passwordHashToCheck[i] != storedHash[i])
+                    {
+                        Console.WriteLine("Wrong password");
+                        return false;
+                    }
+            }
+
+            return true;
+        }
     }
 }

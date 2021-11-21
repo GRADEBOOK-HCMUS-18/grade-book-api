@@ -46,9 +46,27 @@ namespace grade_book_api.Controllers
             _logger.LogInformation($"Received to token with id {userId}");
             var updateUser = _userServices.UpdateUser(userId, request.FirstName, request.LastName,
                 request.StudentIdentification,
-                request.Password, request.Email);
+                request.Email);
             if (updateUser is null) return NotFound();
             return Ok(new UserInformationResponse(updateUser));
+        }
+
+        [HttpPut]
+        [Route("password")]
+        public IActionResult UpdateUserPassword([FromBody] UserUpdatePasswordRequest request)
+        {
+            try
+            {
+                var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+                var result = _userServices.UpdateUserPassword(userId, request.OldPassword, request.NewPassword);
+                if (result is not null)
+                    return Ok(new UserInformationResponse(result));
+                return BadRequest("Old password is incorrect");
+            }
+            catch (ApplicationException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPut]
@@ -68,11 +86,12 @@ namespace grade_book_api.Controllers
                 "image/pjpeg",
                 "image/png"
             };
-            if (!allowedContentType.Contains(image.ContentType.ToLower())){
+            if (!allowedContentType.Contains(image.ContentType.ToLower()))
+            {
                 _logger.LogError("Throw bad request because of insufficent content type");
                 return BadRequest("Content type is not image");
             }
-                
+
 
             var fileExtension = Path.GetExtension(image.FileName);
 

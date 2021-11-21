@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationCore.Services
 {
-    public class InvitationService: IInvitationService
+    public class InvitationService : IInvitationService
     {
         private readonly IBaseRepository<Class> _classRepository;
 
@@ -12,10 +12,11 @@ namespace ApplicationCore.Services
         {
             _classRepository = classRepository;
         }
+
         public Class GetClassFromInvitation(string inviteString)
         {
             var foundClass = _classRepository.GetFirst(cl =>
-                cl.InviteStringStudent == inviteString || cl.InviteStringTeacher == inviteString,
+                    cl.InviteStringStudent == inviteString || cl.InviteStringTeacher == inviteString,
                 cl => cl.Include(c => c.MainTeacher));
             if (foundClass is null)
                 return null;

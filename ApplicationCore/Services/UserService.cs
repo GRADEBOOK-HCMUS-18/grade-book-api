@@ -68,7 +68,7 @@ namespace ApplicationCore.Services
         }
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
-            string newPassword, string newEmail)
+            string newEmail)
         {
             var found = _userRepository.GetFirst(user => user.Id == id);
             if (found is null) return null;
@@ -80,16 +80,32 @@ namespace ApplicationCore.Services
 
             if (!string.IsNullOrEmpty(newEmail)) found.Email = newEmail;
 
-            if (!string.IsNullOrEmpty(newPassword))
-            {
-                PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
-                found.PasswordHash = newHash;
-                found.PasswordSalt = newSalt;
-                found.IsPasswordNotSet = false;
-            }
 
             var result = _userRepository.Update(found);
             return result;
+        }
+
+        public User UpdateUserPassword(int userId, string oldPassword, string newPassword)
+        {
+            var found = _userRepository.GetFirst(user => user.Id == userId);
+            if (found is null)
+                throw new ApplicationException("User does not exist");
+
+            if (!found.IsPasswordNotSet)
+            {
+                var validOldPassword =
+                    PasswordHelper.CheckPasswordHash(oldPassword, found.PasswordHash, found.PasswordSalt);
+                if (!validOldPassword)
+                    return null;
+            }
+
+            PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
+            found.PasswordHash = newHash;
+            found.PasswordSalt = newSalt;
+            found.IsPasswordNotSet = false;
+
+            _ = _userRepository.Update(found);
+            return found;
         }
 
         public string UpdateUserAvatar(int id, Stream newPicture)

@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Services;
@@ -11,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -33,7 +31,7 @@ namespace grade_book_api
             services.AddDbContext<AppDbContext>(
                 builder =>
                     builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
-                       // .LogTo(Console.WriteLine, LogLevel.Information)
+                // .LogTo(Console.WriteLine, LogLevel.Information)
             );
             services.AddSwaggerGen(c =>
             {
