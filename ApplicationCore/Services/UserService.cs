@@ -75,10 +75,29 @@ namespace ApplicationCore.Services
 
             if (!string.IsNullOrEmpty(newFirstname)) found.FirstName = newFirstname;
             if (!string.IsNullOrEmpty(newLastname)) found.LastName = newLastname;
+            // TODO: throw if student Id already exists and belong to another stundet
 
-            if (!string.IsNullOrEmpty(newStudentIdentification)) found.StudentIdentification = newStudentIdentification;
+            if (!string.IsNullOrEmpty(newStudentIdentification))
+            {
+                var foundExistedStudent =
+                    _userRepository.GetFirst(user => user.StudentIdentification == newStudentIdentification);
+                if (foundExistedStudent is not null)
+                {
+                    throw new ApplicationException($"Student with {newStudentIdentification} already exists"); 
+                }
 
-            if (!string.IsNullOrEmpty(newEmail)) found.Email = newEmail;
+                found.StudentIdentification = newStudentIdentification;
+            }
+
+            if (!string.IsNullOrEmpty(newEmail))
+            {
+                var foundExistedStudent = _userRepository.GetFirst(user => user.Email == newEmail);
+                if (foundExistedStudent is not null)
+                {
+                    throw new ApplicationException($"User with {newEmail} email already exists"); 
+                }
+                found.Email = newEmail;
+            }
 
 
             var result = _userRepository.Update(found);
