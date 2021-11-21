@@ -44,11 +44,19 @@ namespace grade_book_api.Controllers
             // get userId from claim
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             _logger.LogInformation($"Received to token with id {userId}");
-            var updateUser = _userServices.UpdateUser(userId, request.FirstName, request.LastName,
-                request.StudentIdentification,
-                request.Email);
-            if (updateUser is null) return NotFound();
-            return Ok(new UserInformationResponse(updateUser));
+            try
+            {
+                var updateUser = _userServices.UpdateUser(userId, request.FirstName, request.LastName,
+                    request.StudentIdentification,
+                    request.Email);
+                if (updateUser is null) return NotFound();
+                return Ok(new UserInformationResponse(updateUser));
+
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
