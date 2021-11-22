@@ -10,11 +10,13 @@ namespace grade_book_api.Responses.User
             ProfilePictureUrl = source.ProfilePictureUrl;
             DefaultProfilePictureHex = source.DefaultProfilePictureHex;
             IsPasswordNotSet = source.IsPasswordNotSet;
+            StudentIdentification = source.StudentIdentification;
         }
 
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string StudentIdentification { get; set; }
         public string ProfilePictureUrl { get; set; }
 
         public string DefaultProfilePictureHex { get; set; }
