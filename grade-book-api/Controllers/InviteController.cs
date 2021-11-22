@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using ApplicationCore.Interfaces;
+using grade_book_api.Requests;
 using grade_book_api.Responses.Invitation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +16,35 @@ namespace grade_book_api.Controllers
         private readonly IInvitationService _invitationService;
         private readonly ILogger<InviteController> _logger;
         private readonly IUserServices _userService;
+        private readonly IEmailSender _emailSender;
 
         public InviteController(ILogger<InviteController> logger, IInvitationService invitationService,
             IUserServices userServices,
-            IClassService classService)
+            IClassService classService,
+            IEmailSender emailSender)
         {
             _logger = logger;
             _invitationService = invitationService;
             _userService = userServices;
             _classService = classService;
+            _emailSender = emailSender;
+        }
+
+        [HttpPut]
+        [Route("email")]
+        public IActionResult TryEmail([FromBody] EmailSendingRequest request)
+        {
+            string htmlMessage = $"{request.MailContent}  <a>{request.UrlToSend}</a>";
+            try
+            {
+                _emailSender.BulkSendEmail(request.MailList, "Test 5th", htmlMessage);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet]

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using MailKit.Net.Smtp;
@@ -38,6 +39,15 @@ namespace Infrastructure
 
 
             await smtp.DisconnectAsync(true);
+        }
+
+        public Task BulkSendEmail(List<string> addresses, string subject, string htmlMessage)
+        {
+            foreach (var address in addresses)
+            {
+                SendEmail(address, subject, htmlMessage);
+            }
+            return Task.CompletedTask;
         }
     }
 }
