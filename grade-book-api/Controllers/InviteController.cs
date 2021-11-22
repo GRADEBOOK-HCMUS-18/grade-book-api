@@ -30,14 +30,16 @@ namespace grade_book_api.Controllers
             _emailSender = emailSender;
         }
 
-        [HttpPut]
-        [Route("email")]
+        [Authorize]
+        [HttpPost]
+        [Route("email/send")]
         public IActionResult TryEmail([FromBody] EmailSendingRequest request)
         {
-            string htmlMessage = $"{request.MailContent}  <a>{request.UrlToSend}</a>";
+            string htmlMessage = $"{request.MailContent} : <a href=\"{request.UrlToSend}\">Link</a>";
             try
             {
-                _emailSender.BulkSendEmail(request.MailList, "Test 5th", htmlMessage);
+                _emailSender
+                    .BulkSendEmail(request.MailList, $"GradeBook: {request.MailSubject}", htmlMessage);
                 return Ok();
             }
             catch (Exception ex)
