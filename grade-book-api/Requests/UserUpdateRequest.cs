@@ -4,7 +4,7 @@ namespace grade_book_api.Requests
 {
     public class UserUpdateRequest
     {
-        [EmailAddress] public string Email { get; set; }
+         public string Email { get; set; }
 
 
         [MaxLength(32)] public string FirstName { get; set; }
