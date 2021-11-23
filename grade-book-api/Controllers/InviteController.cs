@@ -31,8 +31,7 @@ namespace grade_book_api.Controllers
         }
 
         [Authorize]
-        [HttpPost]
-        [Route("email/send")]
+        [HttpPost("email/send")]
         public IActionResult TryEmail([FromBody] EmailSendingRequest request)
         {
             string htmlMessage = $"{request.MailContent} : <a href=\"{request.UrlToSend}\">Link</a>";
