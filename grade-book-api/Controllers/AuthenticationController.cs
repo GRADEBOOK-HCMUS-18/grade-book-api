@@ -71,8 +71,7 @@ namespace grade_book_api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("google")]
+        [HttpPost("google")]
         public IActionResult TryAuthenticateGoogle([FromBody] GoogleAuthenticateRequest request)
         {
             // check if user existed 
