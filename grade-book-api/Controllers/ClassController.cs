@@ -83,40 +83,29 @@ namespace grade_book_api.Controllers
             return Ok(new ClassShortInformationResponse(newAddClass, "teacher", newAddClass.MainTeacher));
         }
 
-        [HttpGet("{classId}/gradestructure")]
-        public IActionResult GetClassGradeStructure(int classId)
+        [HttpGet("{classId}/assignment")]
+        public IActionResult GetClassAssignments(int classId)
         {
             return Ok();
         }
 
-        [HttpPost]
-        [Route("student")]
-        public IActionResult AddStudentToClass([FromBody] AddStudentToClassRequest request)
+        [HttpPost("{classId}/assignment")]
+        public IActionResult AddClassAssignment(int classId)
         {
-            try
-            {
-                _classService.AddStudentToClass(request.ClassId, request.StudentId);
-                return Ok();
-            }
-            catch (ApplicationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok();
         }
 
-        [HttpPost]
-        [Route("teacher")]
-        public IActionResult AddTeacherToClass([FromBody] AddTeacherToClassRequest request)
+        [HttpPut("{classId}/assignment/{assignmentId}")]
+        public IActionResult UpdateClassAssignment(int classId, int assignmentId)
         {
-            try
-            {
-                _classService.AddTeacherToClass(request.ClassId, request.TeacherId);
-                return Ok();
-            }
-            catch (ApplicationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok();
         }
+
+        [HttpDelete("{classId}/assignment/{assignmentId}")]
+        public IActionResult DeleteClassAssignment(int classId, int assignmentId)
+        {
+            return Ok();
+        }
+
     }
 }
