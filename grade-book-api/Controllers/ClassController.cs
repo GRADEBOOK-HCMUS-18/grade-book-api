@@ -83,6 +83,12 @@ namespace grade_book_api.Controllers
             return Ok(new ClassShortInformationResponse(newAddClass, "teacher", newAddClass.MainTeacher));
         }
 
+        [HttpGet("{classId}/gradestructure")]
+        public IActionResult GetClassGradeStructure(int classId)
+        {
+            return Ok();
+        }
+
         [HttpPost]
         [Route("student")]
         public IActionResult AddStudentToClass([FromBody] AddStudentToClassRequest request)
