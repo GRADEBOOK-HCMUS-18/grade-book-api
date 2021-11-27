@@ -14,6 +14,7 @@ namespace Infrastructure
         public DbSet<Class> Classes { get; set; }
         public DbSet<ClassStudents> ClassStudents { get; set; }
         public DbSet<ClassTeachers> ClassTeachers { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
