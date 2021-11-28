@@ -4,6 +4,6 @@ namespace grade_book_api.Requests.ClassRequests
 {
     public class UpdateAssignmentPriorityRequest
     {
-        public List<int> AssignmentIdPriorityOrder { get; set; } = new List<int>();
+        public List<int> AssignmentIdPriorityOrder { get; set; } = new();
     }
 }

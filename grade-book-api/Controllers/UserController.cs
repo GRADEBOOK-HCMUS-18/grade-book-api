@@ -51,7 +51,6 @@ namespace grade_book_api.Controllers
                     request.Email);
                 if (updateUser is null) return NotFound();
                 return Ok(new UserInformationResponse(updateUser));
-
             }
             catch (ApplicationException ex)
             {

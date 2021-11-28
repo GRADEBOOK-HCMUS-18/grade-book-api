@@ -38,11 +38,11 @@ namespace ApplicationCore.Services
                 cl => cl.Include(c => c.MainTeacher)
                     .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student)
                     .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher)
-                    .Include(c => c.ClassAssignments));        
+                    .Include(c => c.ClassAssignments));
             if (foundClass is null)
                 return null;
             foundClass.ClassAssignments = foundClass.ClassAssignments.OrderBy(a => a.Priority).ToList();
-    
+
             return foundClass;
         }
 
@@ -150,7 +150,6 @@ namespace ApplicationCore.Services
             if (foundClass is null)
                 return null;
             return foundClass.ClassAssignments.OrderBy(a => a.Priority).ToList();
-
         }
 
         public Assignment AddNewClassAssignment(int classId, string name, int point)
@@ -194,11 +193,8 @@ namespace ApplicationCore.Services
 
             foreach (var assignment in currentClassAssignments)
             {
-                int indexInNewOrder = newOrder.IndexOf(assignment.Id);
-                if (indexInNewOrder > -1)
-                {
-                    assignment.Priority = indexInNewOrder * 100; 
-                }
+                var indexInNewOrder = newOrder.IndexOf(assignment.Id);
+                if (indexInNewOrder > -1) assignment.Priority = indexInNewOrder * 100;
             }
 
             _classRepository.Update(foundClass);

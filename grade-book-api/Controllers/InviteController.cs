@@ -13,10 +13,10 @@ namespace grade_book_api.Controllers
     public class InviteController : ControllerBase
     {
         private readonly IClassService _classService;
+        private readonly IEmailSender _emailSender;
         private readonly IInvitationService _invitationService;
         private readonly ILogger<InviteController> _logger;
         private readonly IUserServices _userService;
-        private readonly IEmailSender _emailSender;
 
         public InviteController(ILogger<InviteController> logger, IInvitationService invitationService,
             IUserServices userServices,
@@ -34,7 +34,7 @@ namespace grade_book_api.Controllers
         [HttpPost("email/send")]
         public IActionResult TryEmail([FromBody] EmailSendingRequest request)
         {
-            string htmlMessage = $"{request.MailContent} : <a href=\"{request.UrlToSend}\">Link</a>";
+            var htmlMessage = $"{request.MailContent} : <a href=\"{request.UrlToSend}\">Link</a>";
             try
             {
                 _emailSender
@@ -45,7 +45,6 @@ namespace grade_book_api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpGet]

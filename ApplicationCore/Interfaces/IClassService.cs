@@ -13,7 +13,7 @@ namespace ApplicationCore.Interfaces
         Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId);
         void AddStudentToClass(int classId, int studentId);
         void AddTeacherToClass(int classId, int teacherId);
-        
+
         // assignments related
 
         List<Assignment> GetClassAssignments(int classId);

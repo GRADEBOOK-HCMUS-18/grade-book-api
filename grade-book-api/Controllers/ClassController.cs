@@ -48,7 +48,7 @@ namespace grade_book_api.Controllers
         [HttpGet]
         public IActionResult GetClassList()
         {
-            var userId = GetCurrentUserId(); 
+            var userId = GetCurrentUserId();
             try
             {
                 var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
@@ -90,22 +90,21 @@ namespace grade_book_api.Controllers
             if (foundList is null)
                 return NotFound("Class not found");
 
-            return Ok(foundList.Select(e => new AssignmentInformationResponse(e))); 
+            return Ok(foundList.Select(e => new AssignmentInformationResponse(e)));
         }
 
         [HttpPost("{classId}/assignment")]
-        public IActionResult AddClassAssignment(int classId, AddAssignmentRequest request )
+        public IActionResult AddClassAssignment(int classId, AddAssignmentRequest request)
         {
-            
             var userId = GetCurrentUserId();
-            
+
             var foundClass = _classService.GetClassDetail(classId);
             if (foundClass is null)
                 return BadRequest("Class does not exists");
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId); 
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
             // check if user is a teacher in class 
             if (userRoleInClass != 1)
-                return Unauthorized("User not a teacher in class"); 
+                return Unauthorized("User not a teacher in class");
 
             var newAssignment = _classService.AddNewClassAssignment(classId, request.Name, request.Point);
             var response = new AssignmentInformationResponse(newAssignment);
@@ -126,39 +125,37 @@ namespace grade_book_api.Controllers
             var updatedAssignment = _classService.UpdateClassAssignment(assignmentId, request.Name, request.Point);
 
             var response = new AssignmentInformationResponse(updatedAssignment);
-            
+
             return Ok(response);
         }
 
         [HttpPut("{classId}/assignment/priority")]
-        public IActionResult UpdateClassAssignmentPriority(int classId, [FromBody] UpdateAssignmentPriorityRequest request)
+        public IActionResult UpdateClassAssignmentPriority(int classId,
+            [FromBody] UpdateAssignmentPriorityRequest request)
         {
-            var userId  = GetCurrentUserId(); 
+            var userId = GetCurrentUserId();
             var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
             // check if user is a teacher in class 
             if (userRoleInClass != 1)
                 return Unauthorized("User not a teacher in class");
 
             var resultAssignmentList =
-                _classService.UpdateClassAssignmentPriority(classId, request.AssignmentIdPriorityOrder); 
-            
-            
+                _classService.UpdateClassAssignmentPriority(classId, request.AssignmentIdPriorityOrder);
+
+
             return Ok(resultAssignmentList.Select(a => new AssignmentInformationResponse(a)));
         }
-        
+
         [HttpDelete("{classId}/assignment/{assignmentId}")]
         public IActionResult RemoveClassAssignment(int classId, int assignmentId)
         {
             var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId); 
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
             // check if user is a teacher in class 
             if (userRoleInClass != 1)
                 return Unauthorized("User not a teacher in class");
             var result = _classService.RemoveAssignment(assignmentId);
-            if (result)
-            {
-                return Ok($"Assignment with Id {assignmentId} removed");
-            }
+            if (result) return Ok($"Assignment with Id {assignmentId} removed");
 
             return BadRequest("Error while removing");
         }
@@ -168,6 +165,5 @@ namespace grade_book_api.Controllers
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             return userId;
         }
-
     }
 }

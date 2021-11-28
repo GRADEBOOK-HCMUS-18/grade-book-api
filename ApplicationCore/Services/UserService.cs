@@ -81,9 +81,7 @@ namespace ApplicationCore.Services
                 var foundExistedStudent =
                     _userRepository.GetFirst(user => user.StudentIdentification == newStudentIdentification);
                 if (foundExistedStudent is not null)
-                {
-                    throw new ApplicationException($"Student with {newStudentIdentification} already exists"); 
-                }
+                    throw new ApplicationException($"Student with {newStudentIdentification} already exists");
 
                 found.StudentIdentification = newStudentIdentification;
             }
@@ -92,9 +90,7 @@ namespace ApplicationCore.Services
             {
                 var foundExistedStudent = _userRepository.GetFirst(user => user.Email == newEmail);
                 if (foundExistedStudent is not null)
-                {
-                    throw new ApplicationException($"User with {newEmail} email already exists"); 
-                }
+                    throw new ApplicationException($"User with {newEmail} email already exists");
                 found.Email = newEmail;
             }
 
