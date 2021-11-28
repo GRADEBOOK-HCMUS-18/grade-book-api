@@ -22,5 +22,6 @@ namespace ApplicationCore.Interfaces
         bool RemoveAssignment(int assignmentId);
 
         Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint);
+        List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder);
     }
 }

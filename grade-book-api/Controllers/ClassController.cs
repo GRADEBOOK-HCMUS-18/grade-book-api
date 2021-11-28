@@ -118,7 +118,7 @@ namespace grade_book_api.Controllers
         public IActionResult UpdateClassAssignment(int classId, int assignmentId, [FromBody] UpdateClassRequest request)
         {
             var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId); 
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
             // check if user is a teacher in class 
             if (userRoleInClass != 1)
                 return Unauthorized("User not a teacher in class");
@@ -130,6 +130,22 @@ namespace grade_book_api.Controllers
             return Ok(response);
         }
 
+        [HttpPut("{classId}/assignment/priority")]
+        public IActionResult UpdateClassAssignmentPriority(int classId, [FromBody] UpdateAssignmentPriorityRequest request)
+        {
+            var userId  = GetCurrentUserId(); 
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            // check if user is a teacher in class 
+            if (userRoleInClass != 1)
+                return Unauthorized("User not a teacher in class");
+
+            var resultAssignmentList =
+                _classService.UpdateClassAssignmentPriority(classId, request.AssignmentIdPriorityOrder); 
+            
+            
+            return Ok(resultAssignmentList.Select(a => new AssignmentInformationResponse(a)));
+        }
+        
         [HttpDelete("{classId}/assignment/{assignmentId}")]
         public IActionResult RemoveClassAssignment(int classId, int assignmentId)
         {
