@@ -10,6 +10,7 @@ namespace ApplicationCore.Services
 {
     public class ClassService : IClassService
     {
+        private readonly IBaseRepository<Assignment> _assignmentRepository;
         private readonly IBaseRepository<Class> _classRepository;
         private readonly IBaseRepository<ClassStudents> _classStudentsRepository;
         private readonly IBaseRepository<ClassTeachers> _classTeacherRepository;
@@ -20,13 +21,15 @@ namespace ApplicationCore.Services
             IBaseRepository<Class> classRepository,
             IBaseRepository<User> userRepository,
             IBaseRepository<ClassStudents> classStudentsRepository,
-            IBaseRepository<ClassTeachers> classTeacherRepository)
+            IBaseRepository<ClassTeachers> classTeacherRepository,
+            IBaseRepository<Assignment> assignmentRepository)
         {
             _logger = logger;
             _classRepository = classRepository;
             _userRepository = userRepository;
             _classStudentsRepository = classStudentsRepository;
             _classTeacherRepository = classTeacherRepository;
+            _assignmentRepository = assignmentRepository;
         }
 
         public Class GetClassDetail(int classId)
@@ -34,7 +37,8 @@ namespace ApplicationCore.Services
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
                 cl => cl.Include(c => c.MainTeacher)
                     .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student)
-                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher));
+                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher)
+                    .Include(c => c.ClassAssignments));
             if (foundClass is null)
                 return null;
             return foundClass;
@@ -134,6 +138,51 @@ namespace ApplicationCore.Services
                 TeacherId = foundUser.Id
             };
             _classTeacherRepository.Insert(newClassTeacherRecord);
+        }
+
+        public List<Assignment> GetClassAssignments(int classId)
+        {
+            var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
+                cl => cl.Include(c => c.ClassAssignments));
+
+            if (foundClass is null)
+                return null;
+            return foundClass.ClassAssignments.ToList();
+
+        }
+
+        public Assignment AddNewClassAssignment(int classId, string name, int point)
+        {
+            var foundClass = GetClassDetail(classId);
+            var newAssignment = new Assignment {Name = name, Point = point, Priority = 0, Class = foundClass};
+
+
+            _assignmentRepository.Insert(newAssignment);
+
+            return newAssignment;
+        }
+
+        public bool RemoveAssignment(int assignmentId)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(assignment => assignment.Id == assignmentId);
+            if (foundAssignment is null)
+                return false;
+            _assignmentRepository.Delete(foundAssignment);
+            return true;
+        }
+
+        public Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(assignment => assignment.Id == assignmentId,
+                assignment
+                    => assignment.Include(a => a.Class));
+            if (foundAssignment is null)
+                return null;
+            foundAssignment.Name = newName;
+            foundAssignment.Point = newPoint;
+            _assignmentRepository.Update(foundAssignment);
+
+            return foundAssignment;
         }
 
         private User GetUserWithClassInformation(int studentId)
