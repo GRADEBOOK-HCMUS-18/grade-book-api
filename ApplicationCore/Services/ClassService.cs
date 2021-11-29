@@ -41,7 +41,9 @@ namespace ApplicationCore.Services
                     .Include(c => c.ClassAssignments));
             if (foundClass is null)
                 return null;
-            foundClass.ClassAssignments = foundClass.ClassAssignments.OrderBy(a => a.Priority).ToList();
+            foundClass.ClassAssignments = foundClass.ClassAssignments.OrderBy(a => a.Priority)
+                .ThenByDescending(assignment => assignment.Id)
+                .ToList();
 
             return foundClass;
         }
@@ -149,7 +151,9 @@ namespace ApplicationCore.Services
 
             if (foundClass is null)
                 return null;
-            return foundClass.ClassAssignments.OrderBy(a => a.Priority).ToList();
+            return foundClass.ClassAssignments.OrderBy(a => a.Priority)
+                .ThenByDescending(assignment =>assignment.Id)
+                .ToList();
         }
 
         public Assignment AddNewClassAssignment(int classId, string name, int point)
@@ -194,11 +198,13 @@ namespace ApplicationCore.Services
             foreach (var assignment in currentClassAssignments)
             {
                 var indexInNewOrder = newOrder.IndexOf(assignment.Id);
-                if (indexInNewOrder > -1) assignment.Priority = indexInNewOrder * 100;
+                if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
             }
 
             _classRepository.Update(foundClass);
-            return currentClassAssignments.OrderBy(assignment => assignment.Priority).ToList();
+            return currentClassAssignments.OrderBy(assignment => assignment.Priority)
+                .ThenByDescending(assignment => assignment.Id)
+                .ToList();
         }
 
         private User GetUserWithClassInformation(int studentId)

@@ -61,6 +61,8 @@ namespace grade_book_api.Controllers
                 classesResponse.AddRange(studentClasses.Select(cl =>
                     new ClassShortInformationResponse(cl, "student", cl.MainTeacher)));
 
+                classesResponse = classesResponse.OrderByDescending(cl => cl.StartDate).ToList();
+
                 return Ok(classesResponse);
             }
             catch (Exception ex)
