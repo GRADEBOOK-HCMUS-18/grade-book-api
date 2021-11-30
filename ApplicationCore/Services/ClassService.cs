@@ -218,10 +218,11 @@ namespace ApplicationCore.Services
         private Class TryGetAvailableClass(User foundUser, int classId)
         {
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.MainTeacher));
+             if (foundClass is null)
+                            throw new ApplicationException("Class does not exists");
             if (foundClass.MainTeacher == foundUser)
                 throw new ApplicationException("User is currently the main teacher of this class");
-            if (foundClass is null)
-                throw new ApplicationException("Class does not exists");
+           
 
             if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
                 throw new ApplicationException("User already a student in class");
