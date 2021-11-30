@@ -3,47 +3,23 @@ using System;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211127121904_add-grade-structure")]
+    partial class addgradestructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.12")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-            modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Point")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.ToTable("Assignments");
-                });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
                 {
@@ -116,6 +92,32 @@ namespace Infrastructure.Migrations
                     b.ToTable("ClassTeachers");
                 });
 
+            modelBuilder.Entity("ApplicationCore.Entity.GradeStructure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Percent")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("GradeStructure");
+                });
+
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>
                 {
                     b.Property<int>("Id")
@@ -153,14 +155,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.Class", null)
-                        .WithMany("ClassAssignments")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
@@ -211,9 +205,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("ApplicationCore.Entity.GradeStructure", b =>
+                {
+                    b.HasOne("ApplicationCore.Entity.Class", null)
+                        .WithMany("ClassGradeStructures")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
                 {
-                    b.Navigation("ClassAssignments");
+                    b.Navigation("ClassGradeStructures");
 
                     b.Navigation("ClassStudents");
 

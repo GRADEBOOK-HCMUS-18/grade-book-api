@@ -31,9 +31,9 @@ namespace Infrastructure
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
 
-            string stmpHost = _configuration["MailSettings:Host"];
+            var stmpHost = _configuration["MailSettings:Host"];
             await smtp.ConnectAsync(stmpHost);
-            string senderPassword = _configuration["MailSettings:Password"];
+            var senderPassword = _configuration["MailSettings:Password"];
             await smtp.AuthenticateAsync(senderAddress, senderPassword);
             await smtp.SendAsync(email);
 
@@ -43,10 +43,7 @@ namespace Infrastructure
 
         public Task BulkSendEmail(List<string> addresses, string subject, string htmlMessage)
         {
-            foreach (var address in addresses)
-            {
-                SendEmail(address, subject, htmlMessage);
-            }
+            foreach (var address in addresses) SendEmail(address, subject, htmlMessage);
             return Task.CompletedTask;
         }
     }

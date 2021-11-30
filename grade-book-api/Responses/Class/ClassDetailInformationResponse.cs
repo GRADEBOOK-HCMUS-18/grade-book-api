@@ -20,6 +20,7 @@ namespace grade_book_api.Responses.Class
             MainTeacher = new UserInformationResponse(inputClass.MainTeacher);
             SubTeachers = inputClass.ClassTeachers.Select(ct => new UserInformationResponse(ct.Teacher)).ToList();
             Students = inputClass.ClassStudents.Select(cs => new UserInformationResponse(cs.Student)).ToList();
+            Assignments = inputClass.ClassAssignments.Select(a => new AssignmentInformationResponse(a)).ToList();
         }
 
         public int Id { get; set; }
@@ -35,5 +36,8 @@ namespace grade_book_api.Responses.Class
         public UserInformationResponse MainTeacher { get; set; }
         public List<UserInformationResponse> SubTeachers { get; set; } = new();
         public List<UserInformationResponse> Students { get; set; } = new();
+
+        public List<AssignmentInformationResponse> Assignments { get; set; } =
+            new();
     }
 }

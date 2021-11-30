@@ -10,6 +10,7 @@ namespace ApplicationCore.Services
 {
     public class ClassService : IClassService
     {
+        private readonly IBaseRepository<Assignment> _assignmentRepository;
         private readonly IBaseRepository<Class> _classRepository;
         private readonly IBaseRepository<ClassStudents> _classStudentsRepository;
         private readonly IBaseRepository<ClassTeachers> _classTeacherRepository;
@@ -20,13 +21,15 @@ namespace ApplicationCore.Services
             IBaseRepository<Class> classRepository,
             IBaseRepository<User> userRepository,
             IBaseRepository<ClassStudents> classStudentsRepository,
-            IBaseRepository<ClassTeachers> classTeacherRepository)
+            IBaseRepository<ClassTeachers> classTeacherRepository,
+            IBaseRepository<Assignment> assignmentRepository)
         {
             _logger = logger;
             _classRepository = classRepository;
             _userRepository = userRepository;
             _classStudentsRepository = classStudentsRepository;
             _classTeacherRepository = classTeacherRepository;
+            _assignmentRepository = assignmentRepository;
         }
 
         public Class GetClassDetail(int classId)
@@ -34,9 +37,14 @@ namespace ApplicationCore.Services
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
                 cl => cl.Include(c => c.MainTeacher)
                     .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student)
-                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher));
+                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher)
+                    .Include(c => c.ClassAssignments));
             if (foundClass is null)
                 return null;
+            foundClass.ClassAssignments = foundClass.ClassAssignments.OrderBy(a => a.Priority)
+                .ThenByDescending(assignment => assignment.Id)
+                .ToList();
+
             return foundClass;
         }
 
@@ -136,6 +144,69 @@ namespace ApplicationCore.Services
             _classTeacherRepository.Insert(newClassTeacherRecord);
         }
 
+        public List<Assignment> GetClassAssignments(int classId)
+        {
+            var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
+                cl => cl.Include(c => c.ClassAssignments));
+
+            if (foundClass is null)
+                return null;
+            return foundClass.ClassAssignments.OrderBy(a => a.Priority)
+                .ThenByDescending(assignment =>assignment.Id)
+                .ToList();
+        }
+
+        public Assignment AddNewClassAssignment(int classId, string name, int point)
+        {
+            var foundClass = GetClassDetail(classId);
+            var newAssignment = new Assignment {Name = name, Point = point, Priority = 0, Class = foundClass};
+
+
+            _assignmentRepository.Insert(newAssignment);
+
+            return newAssignment;
+        }
+
+        public bool RemoveAssignment(int assignmentId)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(assignment => assignment.Id == assignmentId);
+            if (foundAssignment is null)
+                return false;
+            _assignmentRepository.Delete(foundAssignment);
+            return true;
+        }
+
+        public Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(assignment => assignment.Id == assignmentId,
+                assignment
+                    => assignment.Include(a => a.Class));
+            if (foundAssignment is null)
+                return null;
+            foundAssignment.Name = newName;
+            foundAssignment.Point = newPoint;
+            _assignmentRepository.Update(foundAssignment);
+
+            return foundAssignment;
+        }
+
+        public List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder)
+        {
+            var foundClass = GetClassDetail(classId);
+            var currentClassAssignments = foundClass.ClassAssignments;
+
+            foreach (var assignment in currentClassAssignments)
+            {
+                var indexInNewOrder = newOrder.IndexOf(assignment.Id);
+                if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
+            }
+
+            _classRepository.Update(foundClass);
+            return currentClassAssignments.OrderBy(assignment => assignment.Priority)
+                .ThenByDescending(assignment => assignment.Id)
+                .ToList();
+        }
+
         private User GetUserWithClassInformation(int studentId)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == studentId,
@@ -147,10 +218,11 @@ namespace ApplicationCore.Services
         private Class TryGetAvailableClass(User foundUser, int classId)
         {
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.MainTeacher));
+             if (foundClass is null)
+                            throw new ApplicationException("Class does not exists");
             if (foundClass.MainTeacher == foundUser)
                 throw new ApplicationException("User is currently the main teacher of this class");
-            if (foundClass is null)
-                throw new ApplicationException("Class does not exists");
+           
 
             if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
                 throw new ApplicationException("User already a student in class");

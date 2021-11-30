@@ -29,7 +29,7 @@ namespace grade_book_api.Controllers
         [Route("{classId}")]
         public IActionResult GetClassDetail(int classId)
         {
-            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var userId = GetCurrentUserId();
             try
             {
                 var foundClass = _classService.GetClassDetail(classId);
@@ -48,7 +48,7 @@ namespace grade_book_api.Controllers
         [HttpGet]
         public IActionResult GetClassList()
         {
-            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var userId = GetCurrentUserId();
             try
             {
                 var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
@@ -60,6 +60,8 @@ namespace grade_book_api.Controllers
                     new ClassShortInformationResponse(cl, "subteacher", cl.MainTeacher)));
                 classesResponse.AddRange(studentClasses.Select(cl =>
                     new ClassShortInformationResponse(cl, "student", cl.MainTeacher)));
+
+                classesResponse = classesResponse.OrderByDescending(cl => cl.StartDate).ToList();
 
                 return Ok(classesResponse);
             }
@@ -73,7 +75,7 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult AddNewClass(AddNewClassRequest request)
         {
-            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var userId = GetCurrentUserId();
 
             // create new class
 
@@ -83,34 +85,87 @@ namespace grade_book_api.Controllers
             return Ok(new ClassShortInformationResponse(newAddClass, "teacher", newAddClass.MainTeacher));
         }
 
-        [HttpPost]
-        [Route("student")]
-        public IActionResult AddStudentToClass([FromBody] AddStudentToClassRequest request)
+        [HttpGet("{classId}/assignment")]
+        public IActionResult GetClassAssignments(int classId)
         {
-            try
-            {
-                _classService.AddStudentToClass(request.ClassId, request.StudentId);
-                return Ok();
-            }
-            catch (ApplicationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var foundList = _classService.GetClassAssignments(classId);
+            if (foundList is null)
+                return NotFound("Class not found");
+
+            return Ok(foundList.Select(e => new AssignmentInformationResponse(e)));
         }
 
-        [HttpPost]
-        [Route("teacher")]
-        public IActionResult AddTeacherToClass([FromBody] AddTeacherToClassRequest request)
+        [HttpPost("{classId}/assignment")]
+        public IActionResult AddClassAssignment(int classId, AddAssignmentRequest request)
         {
-            try
-            {
-                _classService.AddTeacherToClass(request.ClassId, request.TeacherId);
-                return Ok();
-            }
-            catch (ApplicationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var userId = GetCurrentUserId();
+
+            var foundClass = _classService.GetClassDetail(classId);
+            if (foundClass is null)
+                return BadRequest("Class does not exists");
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            // check if user is a teacher in class 
+            if (userRoleInClass != 1)
+                return Unauthorized("User not a teacher in class");
+
+            var newAssignment = _classService.AddNewClassAssignment(classId, request.Name, request.Point);
+            var response = new AssignmentInformationResponse(newAssignment);
+
+            return Ok(response);
+        }
+
+
+        [HttpPut("{classId}/assignment/{assignmentId}")]
+        public IActionResult UpdateClassAssignment(int classId, int assignmentId, [FromBody] UpdateClassRequest request)
+        {
+            var userId = GetCurrentUserId();
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            // check if user is a teacher in class 
+            if (userRoleInClass != 1)
+                return Unauthorized("User not a teacher in class");
+
+            var updatedAssignment = _classService.UpdateClassAssignment(assignmentId, request.Name, request.Point);
+
+            var response = new AssignmentInformationResponse(updatedAssignment);
+
+            return Ok(response);
+        }
+
+        [HttpPut("{classId}/assignment/priority")]
+        public IActionResult UpdateClassAssignmentPriority(int classId,
+            [FromBody] UpdateAssignmentPriorityRequest request)
+        {
+            var userId = GetCurrentUserId();
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            // check if user is a teacher in class 
+            if (userRoleInClass != 1)
+                return Unauthorized("User not a teacher in class");
+
+            var resultAssignmentList =
+                _classService.UpdateClassAssignmentPriority(classId, request.AssignmentIdPriorityOrder);
+
+
+            return Ok(resultAssignmentList.Select(a => new AssignmentInformationResponse(a)));
+        }
+
+        [HttpDelete("{classId}/assignment/{assignmentId}")]
+        public IActionResult RemoveClassAssignment(int classId, int assignmentId)
+        {
+            var userId = GetCurrentUserId();
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            // check if user is a teacher in class 
+            if (userRoleInClass != 1)
+                return Unauthorized("User not a teacher in class");
+            var result = _classService.RemoveAssignment(assignmentId);
+            if (result) return Ok($"Assignment with Id {assignmentId} removed");
+
+            return BadRequest("Error while removing");
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            return userId;
         }
     }
 }
