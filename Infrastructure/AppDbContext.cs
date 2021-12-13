@@ -12,41 +12,41 @@ namespace Infrastructure
 
         public DbSet<User> Users { get; set; }
         public DbSet<Class> Classes { get; set; }
-        public DbSet<ClassStudents> ClassStudents { get; set; }
-        public DbSet<ClassTeachers> ClassTeachers { get; set; }
+        public DbSet<ClassStudentsAccount> ClassStudentsAccounts { get; set; }
+        public DbSet<ClassTeachersAccount> ClassTeachersAccounts { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // setting up class-user-classstudents
             // set up composite key
-            modelBuilder.Entity<ClassStudents>().HasKey(cs => new {cs.ClassId, cs.StudentId});
+            modelBuilder.Entity<ClassStudentsAccount>().HasKey(cs => new {cs.ClassId, StudentId = cs.StudentAccountId});
             // set up one-many between ClassStudent and Class
-            modelBuilder.Entity<ClassStudents>()
+            modelBuilder.Entity<ClassStudentsAccount>()
                 .HasOne(cs => cs.Class)
                 .WithMany(c => c.ClassStudents)
                 .HasForeignKey(cs => cs.ClassId);
 
             // set up one-many between ClassStudent and Student
-            modelBuilder.Entity<ClassStudents>()
+            modelBuilder.Entity<ClassStudentsAccount>()
                 .HasOne(cs => cs.Student)
-                .WithMany(s => s.ClassStudents)
-                .HasForeignKey(cs => cs.StudentId);
+                .WithMany(s => s.ClassStudentsAccounts)
+                .HasForeignKey(cs => cs.StudentAccountId);
 
 
             // setting up class-user-classteachers
 
-            modelBuilder.Entity<ClassTeachers>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
+            modelBuilder.Entity<ClassTeachersAccount>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             // set up one-many between ClassTeacher and Class
-            modelBuilder.Entity<ClassTeachers>()
+            modelBuilder.Entity<ClassTeachersAccount>()
                 .HasOne(ct => ct.Class)
                 .WithMany(c => c.ClassTeachers)
                 .HasForeignKey(ct => ct.ClassId);
 
             // set up one-many between ClassTeacher and Teacher
-            modelBuilder.Entity<ClassTeachers>()
+            modelBuilder.Entity<ClassTeachersAccount>()
                 .HasOne(ct => ct.Teacher)
-                .WithMany(s => s.ClassTeachers)
+                .WithMany(s => s.ClassTeachersAccounts)
                 .HasForeignKey(ct => ct.TeacherId);
 
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))

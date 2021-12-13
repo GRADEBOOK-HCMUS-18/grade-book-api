@@ -55,14 +55,14 @@ namespace ApplicationCore.Services
                     .GetFirst(cl => cl.Id == classId,
                         cl => cl.Include(c => c.MainTeacher));
             var foundUser = _userRepository.GetFirst(user => user.Id == userId,
-                user => user.Include(u => u.ClassStudents)
-                    .Include(u => u.ClassTeachers));
+                user => user.Include(u => u.ClassStudentsAccounts)
+                    .Include(u => u.ClassTeachersAccounts));
 
             if (foundClass.MainTeacher == foundUser) return 1;
 
-            if (foundUser.ClassTeachers.FirstOrDefault(c => c.ClassId == classId) is not null)
+            if (foundUser.ClassTeachersAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
                 return 1;
-            if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
+            if (foundUser.ClassStudentsAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
                 return -1;
             return 0;
         }

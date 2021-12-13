@@ -12,8 +12,8 @@ namespace ApplicationCore.Entity
         public string InviteStringTeacher { get; set; }
         public string InviteStringStudent { get; set; }
         public User MainTeacher { get; set; }
-        public IList<ClassStudents> ClassStudents { get; set; } = new List<ClassStudents>();
-        public IList<ClassTeachers> ClassTeachers { get; set; } = new List<ClassTeachers>();
+        public IList<ClassStudentsAccount> ClassStudents { get; set; } = new List<ClassStudentsAccount>();
+        public IList<ClassTeachersAccount> ClassTeachers { get; set; } = new List<ClassTeachersAccount>();
 
         public IList<Assignment> ClassAssignments { get; set; } = new List<Assignment>();
     }

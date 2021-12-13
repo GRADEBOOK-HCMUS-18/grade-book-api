@@ -12,16 +12,16 @@ namespace ApplicationCore.Services
     {
         private readonly IBaseRepository<Assignment> _assignmentRepository;
         private readonly IBaseRepository<Class> _classRepository;
-        private readonly IBaseRepository<ClassStudents> _classStudentsRepository;
-        private readonly IBaseRepository<ClassTeachers> _classTeacherRepository;
+        private readonly IBaseRepository<ClassStudentsAccount> _classStudentsRepository;
+        private readonly IBaseRepository<ClassTeachersAccount> _classTeacherRepository;
         private readonly ILogger<ClassService> _logger;
         private readonly IBaseRepository<User> _userRepository;
 
         public ClassService(ILogger<ClassService> logger,
             IBaseRepository<Class> classRepository,
             IBaseRepository<User> userRepository,
-            IBaseRepository<ClassStudents> classStudentsRepository,
-            IBaseRepository<ClassTeachers> classTeacherRepository,
+            IBaseRepository<ClassStudentsAccount> classStudentsRepository,
+            IBaseRepository<ClassTeachersAccount> classTeacherRepository,
             IBaseRepository<Assignment> assignmentRepository)
         {
             _logger = logger;
@@ -63,26 +63,26 @@ namespace ApplicationCore.Services
         {
             var foundUser =
                 _userRepository.GetFirst(user => user.Id == userId,
-                    user => user.Include(u => u.ClassTeachers).ThenInclude(c => c.Class)
+                    user => user.Include(u => u.ClassTeachersAccounts).ThenInclude(c => c.Class)
                         .ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)
                 throw new ApplicationException("User does not exists");
-            return foundUser.ClassTeachers.Select(ct => ct.Class).ToList();
+            return foundUser.ClassTeachersAccounts.Select(ct => ct.Class).ToList();
         }
 
         public List<Class> GetAllClassWithUserBeingStudent(int userId)
         {
             var foundUser =
                 _userRepository.GetFirst(user => user.Id == userId,
-                    user => user.Include(u => u.ClassStudents).ThenInclude(c => c.Class)
+                    user => user.Include(u => u.ClassStudentsAccounts).ThenInclude(c => c.Class)
                         .ThenInclude(cl => cl.MainTeacher));
 
 
             if (foundUser is null)
                 throw new ApplicationException("User does not exists");
-            return foundUser.ClassStudents.Select(ct => ct.Class).ToList();
+            return foundUser.ClassStudentsAccounts.Select(ct => ct.Class).ToList();
         }
 
         public Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId)
@@ -114,12 +114,12 @@ namespace ApplicationCore.Services
             var availableClass = TryGetAvailableClass(foundUser, classId);
 
 
-            var newClassStudentRecord = new ClassStudents
+            var newClassStudentRecord = new ClassStudentsAccount
             {
                 Class = availableClass,
                 ClassId = availableClass.Id,
                 Student = foundUser,
-                StudentId = foundUser.Id
+                StudentAccountId = foundUser.Id
             };
 
             _classStudentsRepository.Insert(newClassStudentRecord);
@@ -134,7 +134,7 @@ namespace ApplicationCore.Services
             var availableClass = TryGetAvailableClass(foundUser, classId);
 
 
-            var newClassTeacherRecord = new ClassTeachers
+            var newClassTeacherRecord = new ClassTeachersAccount
             {
                 Class = availableClass,
                 ClassId = availableClass.Id,
@@ -210,7 +210,7 @@ namespace ApplicationCore.Services
         private User GetUserWithClassInformation(int studentId)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == studentId,
-                user => user.Include(u => u.ClassStudents).Include(u => u.ClassTeachers));
+                user => user.Include(u => u.ClassStudentsAccounts).Include(u => u.ClassTeachersAccounts));
             return foundUser;
         }
 
@@ -224,10 +224,10 @@ namespace ApplicationCore.Services
                 throw new ApplicationException("User is currently the main teacher of this class");
            
 
-            if (foundUser.ClassStudents.FirstOrDefault(c => c.ClassId == classId) is not null)
+            if (foundUser.ClassStudentsAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
                 throw new ApplicationException("User already a student in class");
 
-            if (foundUser.ClassTeachers.FirstOrDefault(c => c.ClassId == classId) is not null)
+            if (foundUser.ClassTeachersAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
                 throw new ApplicationException("User is currently a teacher in class");
             return foundClass;
         }
