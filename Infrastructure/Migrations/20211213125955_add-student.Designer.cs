@@ -3,15 +3,17 @@ using System;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211213125955_add-student")]
+    partial class addstudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,43 +120,25 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
                 {
-                    b.Property<int>("ClassId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StudentIdentification")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("text");
-
-                    b.HasKey("ClassId", "StudentIdentification");
-
-                    b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
-                {
-                    b.Property<int>("StudentAssignmentGradeId")
+                    b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("AssignmentId")
+                    b.Property<int?>("ClassId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("StudentClassId")
-                        .HasColumnType("integer");
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
 
                     b.Property<string>("StudentIdentification")
                         .HasColumnType("text");
 
-                    b.HasKey("StudentAssignmentGradeId");
+                    b.HasKey("Key");
 
-                    b.HasIndex("AssignmentId");
+                    b.HasIndex("ClassId");
 
-                    b.HasIndex("StudentClassId", "StudentIdentification");
-
-                    b.ToTable("StudentAssignmentGrades");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>
@@ -257,29 +241,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
                 {
                     b.HasOne("ApplicationCore.Entity.Class", "Class")
-                        .WithMany("Students")
+                        .WithMany()
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
-                        .WithMany()
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ApplicationCore.Entity.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentClassId", "StudentIdentification")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Assignment");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
@@ -289,8 +255,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ClassStudents");
 
                     b.Navigation("ClassTeachers");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>

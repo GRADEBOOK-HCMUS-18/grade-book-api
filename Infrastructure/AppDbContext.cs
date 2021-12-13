@@ -15,6 +15,9 @@ namespace Infrastructure
         public DbSet<ClassStudentsAccount> ClassStudentsAccounts { get; set; }
         public DbSet<ClassTeachersAccount> ClassTeachersAccounts { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Student> Students { get; set; }
+
+        public DbSet<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +54,16 @@ namespace Infrastructure
 
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
+            
+            // set up composite key for Student table 
+            modelBuilder.Entity<Student>().HasKey(s => new {s.ClassId, s.StudentIdentification});
+            
+            // set up one-many between Student and Class
+
+            modelBuilder.Entity<Student>()
+                .HasOne(s => s.Class)
+                .WithMany(c => c.Students)
+                .HasForeignKey(cs => cs.ClassId); 
         }
     }
 }

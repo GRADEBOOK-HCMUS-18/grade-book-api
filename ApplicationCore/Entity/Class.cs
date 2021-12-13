@@ -15,6 +15,8 @@ namespace ApplicationCore.Entity
         public IList<ClassStudentsAccount> ClassStudents { get; set; } = new List<ClassStudentsAccount>();
         public IList<ClassTeachersAccount> ClassTeachers { get; set; } = new List<ClassTeachersAccount>();
 
+        public IList<Student> Students { get; set; } = new List<Student>(); 
+
         public IList<Assignment> ClassAssignments { get; set; } = new List<Assignment>();
     }
 }

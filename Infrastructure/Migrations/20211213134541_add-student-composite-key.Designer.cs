@@ -3,15 +3,17 @@ using System;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211213134541_add-student-composite-key")]
+    partial class addstudentcompositekey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,31 +134,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
-                {
-                    b.Property<int>("StudentAssignmentGradeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int?>("AssignmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("StudentClassId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StudentIdentification")
-                        .HasColumnType("text");
-
-                    b.HasKey("StudentAssignmentGradeId");
-
-                    b.HasIndex("AssignmentId");
-
-                    b.HasIndex("StudentClassId", "StudentIdentification");
-
-                    b.ToTable("StudentAssignmentGrades");
-                });
-
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>
                 {
                     b.Property<int>("Id")
@@ -263,23 +240,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
-                        .WithMany()
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ApplicationCore.Entity.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentClassId", "StudentIdentification")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Assignment");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>

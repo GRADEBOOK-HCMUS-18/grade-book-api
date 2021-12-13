@@ -30,7 +30,7 @@ namespace grade_book_api
             services.AddControllers();
             services.AddDbContext<AppDbContext>(
                 builder =>
-                    builder.UseNpgsql(Configuration.GetConnectionString("HerokuConnection"))
+                    builder.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"))
                 // .LogTo(Console.WriteLine, LogLevel.Information)
             );
             services.AddSwaggerGen(c =>

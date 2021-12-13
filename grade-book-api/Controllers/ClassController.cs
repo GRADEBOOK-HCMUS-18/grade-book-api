@@ -32,9 +32,9 @@ namespace grade_book_api.Controllers
             var userId = GetCurrentUserId();
             try
             {
-                var foundClass = _classService.GetClassDetail(classId);
                 var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-                if (userRoleInClass == 0) return BadRequest("User not a member in class");
+                if (userRoleInClass == 0) return Unauthorized("User not a member in class");
+                var foundClass = _classService.GetClassDetail(classId);
                 var response = new ClassDetailInformationResponse(foundClass, userRoleInClass == 1);
 
                 return Ok(response);
@@ -161,6 +161,23 @@ namespace grade_book_api.Controllers
 
             return BadRequest("Error while removing");
         }
+        
+        
+        // uploading classstudent 
+        [HttpPost("{classId}/student")]
+        public IActionResult BulkAddClassStudent(int classId)
+        {
+            var userId = GetCurrentUserId();
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            if (userRoleInClass != -1)
+                return Unauthorized("User not teacher in class"); 
+            // TODO: Add Student and fullname
+
+            return Ok();
+        }
+        
+        
+        
 
         private int GetCurrentUserId()
         {
