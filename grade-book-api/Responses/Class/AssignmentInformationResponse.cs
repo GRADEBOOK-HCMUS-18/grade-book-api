@@ -8,7 +8,7 @@ namespace grade_book_api.Responses.Class
         {
             Id = source.Id;
             Name = source.Name;
-            Point = source.Point;
+            Point = source.Weight;
         }
 
         public int Id { get; set; }

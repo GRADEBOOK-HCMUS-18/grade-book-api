@@ -36,8 +36,8 @@ namespace ApplicationCore.Services
         {
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
                 cl => cl.Include(c => c.MainTeacher)
-                    .Include(c => c.ClassStudents).ThenInclude(cs => cs.Student)
-                    .Include(c => c.ClassTeachers).ThenInclude(ct => ct.Teacher)
+                    .Include(c => c.ClassStudentsAccounts).ThenInclude(cs => cs.Student)
+                    .Include(c => c.ClassTeachersAccounts).ThenInclude(ct => ct.Teacher)
                     .Include(c => c.ClassAssignments));
             if (foundClass is null)
                 return null;
@@ -159,7 +159,7 @@ namespace ApplicationCore.Services
         public Assignment AddNewClassAssignment(int classId, string name, int point)
         {
             var foundClass = GetClassDetail(classId);
-            var newAssignment = new Assignment {Name = name, Point = point, Priority = 0, Class = foundClass};
+            var newAssignment = new Assignment {Name = name, Weight = point, Priority = 0, Class = foundClass};
 
 
             _assignmentRepository.Insert(newAssignment);
@@ -184,7 +184,7 @@ namespace ApplicationCore.Services
             if (foundAssignment is null)
                 return null;
             foundAssignment.Name = newName;
-            foundAssignment.Point = newPoint;
+            foundAssignment.Weight = newPoint;
             _assignmentRepository.Update(foundAssignment);
 
             return foundAssignment;
@@ -200,6 +200,8 @@ namespace ApplicationCore.Services
                 var indexInNewOrder = newOrder.IndexOf(assignment.Id);
                 if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
             }
+            
+            // TODO: refactor here 
 
             _classRepository.Update(foundClass);
             return currentClassAssignments.OrderBy(assignment => assignment.Priority)
@@ -207,7 +209,7 @@ namespace ApplicationCore.Services
                 .ToList();
         }
 
-        public List<Student> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs)
+        public List<StudentRecord> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs)
         {
             var foundClass = _classRepository
                 .GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.Students));
@@ -216,11 +218,18 @@ namespace ApplicationCore.Services
             return foundClass.Students.ToList();
         }
 
-        public List<StudentAssignmentGrade> BulkAddStudentGradeToClass(int assignmentId,
-            List<Tuple<string, int>> idGradePairs)
+        public List<StudentAssignmentGrade> BulkAddStudentGradeToAssignment(int assignmentId, List<Tuple<string, int>> idGradePairs)
         {
-            throw new NotImplementedException();
+            var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId,
+                a => 
+                    a.Include(ass => ass.StudentAssignmentGrades)
+                        .Include(ass => ass.Class)
+                        .ThenInclude(c => c.Students));
+            foundAssignment.AddStudentGrades(idGradePairs);
+            _assignmentRepository.Update(foundAssignment);
+            return foundAssignment.StudentAssignmentGrades.ToList();
         }
+
 
         private User GetUserWithClassInformation(int studentId)
         {

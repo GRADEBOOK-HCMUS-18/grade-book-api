@@ -24,6 +24,9 @@ namespace ApplicationCore.Interfaces
         Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint);
         List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder);
 
-        List<Student> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs); 
+        List<StudentRecord> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs);
+
+        List<StudentAssignmentGrade> BulkAddStudentGradeToAssignment(int assignmentId,
+            List<Tuple<string, int>> idGradePairs);
     }
 }

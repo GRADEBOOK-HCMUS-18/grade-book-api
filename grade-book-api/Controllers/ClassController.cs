@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Linq;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
@@ -175,22 +176,32 @@ namespace grade_book_api.Controllers
                 new Tuple<string,string>(s.StudentId,s.FullName)   
             ).ToList();
             var result = _classService.BulkAddStudentToClass(classId, idNamePair); 
-            return Ok();
+            return Ok(result.Select(student => new {StudentId = student.StudentIdentification, FullName = student.FullName}));
         }
 
+        //uploading assignment grade
+        [HttpPost("{classId}/assignment/{assignmentId}/grades")]
 
-        [HttpPost("{classId}/{assignmentId}/grade")]
-
-        public IActionResult BulkAddStudentAssignmentGrade(int classId, int assignmentId)
+        public IActionResult BulkAddStudentAssignmentGrade(int classId, int assignmentId, BulkAddGradesToAssignmentRequest request)
         {
             var userId = GetCurrentUserId();
             var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
             if (userRoleInClass != 1)
-                return Unauthorized("User not teacher in class"); 
-            // TODO: Add student and assignment point 
+                return Unauthorized("User not teacher in class");
 
-            return Ok();
-            
+            var idGradePairs = request.Grades
+                .Select(g => new Tuple<string, int>(g.StudentId, g.Grade)).ToList();
+
+            try
+            {
+                var result = _classService.BulkAddStudentGradeToAssignment(assignmentId, idGradePairs);
+                return Ok(result.Select(sGrade => new
+                    {sGrade.StudentRecord.StudentIdentification, Grade = sGrade.Point, sGrade.IsFinalized}));
+            }
+            catch (ConstraintException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         
 

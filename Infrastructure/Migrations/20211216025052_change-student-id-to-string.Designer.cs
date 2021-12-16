@@ -3,15 +3,17 @@ using System;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211216025052_change-student-id-to-string")]
+    partial class changestudentidtostring
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,6 +118,29 @@ namespace Infrastructure.Migrations
                     b.ToTable("ClassTeachersAccounts");
                 });
 
+            modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
+                {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StudentIdentification")
+                        .HasColumnType("text");
+
+                    b.HasKey("RecordId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("Students");
+                });
+
             modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
                 {
                     b.Property<int>("StudentAssignmentGradeId")
@@ -142,29 +167,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("StudentRecordId");
 
                     b.ToTable("StudentAssignmentGrades");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.StudentRecord", b =>
-                {
-                    b.Property<int>("RecordId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("StudentIdentification")
-                        .HasColumnType("text");
-
-                    b.HasKey("RecordId");
-
-                    b.HasIndex("ClassId");
-
-                    b.ToTable("StudentsRecords");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>
@@ -264,26 +266,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
-                        .WithMany("StudentAssignmentGrades")
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApplicationCore.Entity.StudentRecord", "StudentRecord")
-                        .WithMany("Grades")
-                        .HasForeignKey("StudentRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Assignment");
-
-                    b.Navigation("StudentRecord");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.StudentRecord", b =>
+            modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
                 {
                     b.HasOne("ApplicationCore.Entity.Class", "Class")
                         .WithMany("Students")
@@ -292,6 +275,25 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Class");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
+                {
+                    b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
+                        .WithMany("StudentAssignmentGrades")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApplicationCore.Entity.Student", "Student")
+                        .WithMany("Grades")
+                        .HasForeignKey("StudentRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
@@ -310,7 +312,7 @@ namespace Infrastructure.Migrations
                     b.Navigation("Students");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.StudentRecord", b =>
+            modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
                 {
                     b.Navigation("Grades");
                 });

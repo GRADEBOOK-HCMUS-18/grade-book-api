@@ -18,8 +18,8 @@ namespace grade_book_api.Responses.Class
             InviteStringTeacher = isTeacher ? inputClass.InviteStringTeacher : "";
             IsTeacher = isTeacher;
             MainTeacher = new UserInformationResponse(inputClass.MainTeacher);
-            SubTeachers = inputClass.ClassTeachers.Select(ct => new UserInformationResponse(ct.Teacher)).ToList();
-            Students = inputClass.ClassStudents.Select(cs => new UserInformationResponse(cs.Student)).ToList();
+            SubTeachers = inputClass.ClassTeachersAccounts.Select(ct => new UserInformationResponse(ct.Teacher)).ToList();
+            Students = inputClass.ClassStudentsAccounts.Select(cs => new UserInformationResponse(cs.Student)).ToList();
             Assignments = inputClass.ClassAssignments.Select(a => new AssignmentInformationResponse(a)).ToList();
         }
 

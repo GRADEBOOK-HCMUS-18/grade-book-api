@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApplicationCore.Entity
 {
-    public class Student
+    public class StudentRecord
     {
         public int RecordId; 
         public Class Class { get; set; }

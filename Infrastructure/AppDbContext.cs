@@ -15,7 +15,7 @@ namespace Infrastructure
         public DbSet<ClassStudentsAccount> ClassStudentsAccounts { get; set; }
         public DbSet<ClassTeachersAccount> ClassTeachersAccounts { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
-        public DbSet<Student> Students { get; set; }
+        public DbSet<StudentRecord> StudentsRecords { get; set; }
         public DbSet<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
 
 
@@ -27,7 +27,7 @@ namespace Infrastructure
             modelBuilder.Entity<ClassTeachersAccount>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             SetupTeacherAccountAndClassRelationship(modelBuilder);
 
-            modelBuilder.Entity<Student>().HasKey(s => new {s.RecordId});
+            modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
             SetupClassAndStudentRelationship(modelBuilder);
             SetupAssignmentAndStudentRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
@@ -43,16 +43,16 @@ namespace Infrastructure
                 .WithMany(assignment => assignment.StudentAssignmentGrades)
                 .HasForeignKey(sGrade => sGrade.AssignmentId);
             modelBuilder.Entity<StudentAssignmentGrade>()
-                .HasOne(sGrade => sGrade.Student)
+                .HasOne(sGrade => sGrade.StudentRecord)
                 .WithMany(student => student.Grades)
-                .HasForeignKey(sGrade => sGrade.StudentId);
+                .HasForeignKey(sGrade => sGrade.StudentRecordId);
         }
 
         private static void SetupClassAndStudentRelationship(ModelBuilder modelBuilder)
         {
             // set up one-many between Student and Class
 
-            modelBuilder.Entity<Student>()
+            modelBuilder.Entity<StudentRecord>()
                 .HasOne(s => s.Class)
                 .WithMany(c => c.Students)
                 .HasForeignKey(cs => cs.ClassId);
@@ -65,7 +65,7 @@ namespace Infrastructure
             // set up one-many between ClassTeacher and Class
             modelBuilder.Entity<ClassTeachersAccount>()
                 .HasOne(ct => ct.Class)
-                .WithMany(c => c.ClassTeachers)
+                .WithMany(c => c.ClassTeachersAccounts)
                 .HasForeignKey(ct => ct.ClassId);
 
             // set up one-many between ClassTeacher and Teacher
@@ -82,7 +82,7 @@ namespace Infrastructure
             // set up one-many between ClassStudent and Class
             modelBuilder.Entity<ClassStudentsAccount>()
                 .HasOne(cs => cs.Class)
-                .WithMany(c => c.ClassStudents)
+                .WithMany(c => c.ClassStudentsAccounts)
                 .HasForeignKey(cs => cs.ClassId);
 
             // set up one-many between ClassStudent and Student
