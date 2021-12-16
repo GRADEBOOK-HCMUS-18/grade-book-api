@@ -11,8 +11,8 @@ namespace ApplicationCore.Interfaces
         List<Class> GetAllClassWithUserBeingSubTeacher(int userId);
         List<Class> GetAllClassWithUserBeingStudent(int userId);
         Class AddNewClass(string name, DateTime startDate, string room, string description, int mainTeacherId);
-        void AddStudentToClass(int classId, int studentId);
-        void AddTeacherToClass(int classId, int teacherId);
+        void AddStudentAccountToClass(int classId, int studentId);
+        void AddTeacherAccountToClass(int classId, int teacherId);
 
         // assignments related
 
@@ -23,5 +23,7 @@ namespace ApplicationCore.Interfaces
 
         Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint);
         List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder);
+
+        List<Student> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs); 
     }
 }

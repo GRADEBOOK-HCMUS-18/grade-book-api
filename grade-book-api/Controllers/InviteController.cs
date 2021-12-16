@@ -76,9 +76,9 @@ namespace grade_book_api.Controllers
             try
             {
                 if (isTeacherInvite)
-                    _classService.AddTeacherToClass(foundClass.Id, userId);
+                    _classService.AddTeacherAccountToClass(foundClass.Id, userId);
                 else
-                    _classService.AddStudentToClass(foundClass.Id, userId);
+                    _classService.AddStudentAccountToClass(foundClass.Id, userId);
                 return Ok(
                     $"User with id {userId} added to class {foundClass.Name} with role: {(isTeacherInvite ? "teacher" : "student")} ");
             }

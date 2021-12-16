@@ -118,16 +118,23 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
                 {
+                    b.Property<int>("RecordId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
                     b.Property<int>("ClassId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("StudentIdentification")
-                        .HasColumnType("text");
 
                     b.Property<string>("FullName")
                         .HasColumnType("text");
 
-                    b.HasKey("ClassId", "StudentIdentification");
+                    b.Property<string>("StudentIdentification")
+                        .HasColumnType("text");
+
+                    b.HasKey("RecordId");
+
+                    b.HasIndex("ClassId");
 
                     b.ToTable("Students");
                 });
@@ -139,20 +146,23 @@ namespace Infrastructure.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("AssignmentId")
+                    b.Property<int>("AssignmentId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("StudentClassId")
+                    b.Property<bool>("IsFinalized")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Point")
                         .HasColumnType("integer");
 
-                    b.Property<string>("StudentIdentification")
-                        .HasColumnType("text");
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
 
                     b.HasKey("StudentAssignmentGradeId");
 
                     b.HasIndex("AssignmentId");
 
-                    b.HasIndex("StudentClassId", "StudentIdentification");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("StudentAssignmentGrades");
                 });
@@ -268,18 +278,25 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
                 {
                     b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
-                        .WithMany()
+                        .WithMany("StudentAssignmentGrades")
                         .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ApplicationCore.Entity.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentClassId", "StudentIdentification")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("Grades")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Assignment");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
+                {
+                    b.Navigation("StudentAssignmentGrades");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
@@ -291,6 +308,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("ClassTeachers");
 
                     b.Navigation("Students");
+                });
+
+            modelBuilder.Entity("ApplicationCore.Entity.Student", b =>
+                {
+                    b.Navigation("Grades");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.User", b =>

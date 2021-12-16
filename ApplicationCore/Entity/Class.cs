@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ApplicationCore.Entity
 {
@@ -18,5 +19,33 @@ namespace ApplicationCore.Entity
         public IList<Student> Students { get; set; } = new List<Student>(); 
 
         public IList<Assignment> ClassAssignments { get; set; } = new List<Assignment>();
+
+        public void AddStudents(List<Tuple<string, string>> idNamePairs)
+        {
+            
+            var toAdd = new List<Student>();
+            foreach (var (item1, item2) in idNamePairs)
+            {
+                var foundStudent = Students.FirstOrDefault(student => student.StudentIdentification == item1);
+                if (foundStudent is not null)
+                {
+                    foundStudent.FullName = item2;
+                }
+                else
+                {
+                    toAdd.Add(new Student
+                    {
+                        ClassId = this.Id,
+                        StudentIdentification = item1,
+                        FullName = item2
+                    });
+                }
+            }
+
+            foreach (var student in toAdd)
+            {
+                this.Students.Add(student);
+            }
+        }
     }
 }

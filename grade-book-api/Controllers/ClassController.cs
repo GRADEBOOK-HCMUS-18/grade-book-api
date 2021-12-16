@@ -165,18 +165,33 @@ namespace grade_book_api.Controllers
         
         // uploading classstudent 
         [HttpPost("{classId}/student")]
-        public IActionResult BulkAddClassStudent(int classId)
+        public IActionResult BulkAddClassStudent(int classId, BulkAddStudentsToClassRequest request)
         {
             var userId = GetCurrentUserId();
             var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            if (userRoleInClass != -1)
-                return Unauthorized("User not teacher in class"); 
-            // TODO: Add Student and fullname
-
+            if (userRoleInClass != 1)
+                return Unauthorized("User not teacher in class");
+            var idNamePair = request.Students.Select(s =>
+                new Tuple<string,string>(s.StudentId,s.FullName)   
+            ).ToList();
+            var result = _classService.BulkAddStudentToClass(classId, idNamePair); 
             return Ok();
         }
-        
-        
+
+
+        [HttpPost("{classId}/{assignmentId}/grade")]
+
+        public IActionResult BulkAddStudentAssignmentGrade(int classId, int assignmentId)
+        {
+            var userId = GetCurrentUserId();
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            if (userRoleInClass != 1)
+                return Unauthorized("User not teacher in class"); 
+            // TODO: Add student and assignment point 
+
+            return Ok();
+            
+        }
         
 
         private int GetCurrentUserId()

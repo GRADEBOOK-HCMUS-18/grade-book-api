@@ -105,7 +105,7 @@ namespace ApplicationCore.Services
             return newClass;
         }
 
-        public void AddStudentToClass(int classId, int studentId)
+        public void AddStudentAccountToClass(int classId, int studentId)
         {
             var foundUser = GetUserWithClassInformation(studentId);
             if (foundUser is null)
@@ -125,7 +125,7 @@ namespace ApplicationCore.Services
             _classStudentsRepository.Insert(newClassStudentRecord);
         }
 
-        public void AddTeacherToClass(int classId, int teacherId)
+        public void AddTeacherAccountToClass(int classId, int teacherId)
         {
             var foundUser = GetUserWithClassInformation(teacherId);
             if (foundUser is null)
@@ -205,6 +205,21 @@ namespace ApplicationCore.Services
             return currentClassAssignments.OrderBy(assignment => assignment.Priority)
                 .ThenByDescending(assignment => assignment.Id)
                 .ToList();
+        }
+
+        public List<Student> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs)
+        {
+            var foundClass = _classRepository
+                .GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.Students));
+            foundClass.AddStudents(idNamePairs);
+            _classRepository.Update(foundClass);
+            return foundClass.Students.ToList();
+        }
+
+        public List<StudentAssignmentGrade> BulkAddStudentGradeToClass(int assignmentId,
+            List<Tuple<string, int>> idGradePairs)
+        {
+            throw new NotImplementedException();
         }
 
         private User GetUserWithClassInformation(int studentId)
