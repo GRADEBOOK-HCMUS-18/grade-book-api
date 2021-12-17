@@ -67,8 +67,7 @@ namespace Infrastructure
             return _dbSet.Set<TEntity>();
         }
 
-        public IEnumerable<TEntity> List(
-            Expression<Func<TEntity, bool>> filter = null,
+        public IEnumerable<TEntity> List( Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
 

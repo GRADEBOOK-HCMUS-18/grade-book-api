@@ -14,6 +14,11 @@ namespace ApplicationCore.Entity
         
         public IList<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
 
+        public void SetStudentAssignmentGrades(List<StudentAssignmentGrade> source)
+        {
+            this.StudentAssignmentGrades = source;
+        }
+
         public void AddStudentGrades(List<Tuple<string, int>> idGradePairs )
         {
             var toAdd = new List<StudentAssignmentGrade>();

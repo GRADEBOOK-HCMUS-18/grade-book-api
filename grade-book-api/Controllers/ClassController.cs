@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.ClassRequests;
 using grade_book_api.Responses.Class;
@@ -96,17 +98,54 @@ namespace grade_book_api.Controllers
             return Ok(foundList.Select(e => new AssignmentInformationResponse(e)));
         }
 
+        [HttpGet("{classId}/assignment/{assignmentId}")]
+        public IActionResult GetAssignmentGradeDetail(int classId, int assignmentId)
+        {
+            
+            if (IsTeacherInClass(classId)) // teacher
+            {
+                var result = _classService.GetStudentAssignmentGradeAsTeacher(assignmentId);
+                var response = result.Select(sGrade => new AssignmentGradeResponse(sGrade));
+                return Ok(response); 
+            }
+
+            if(IsStudentInClass(classId)) // student
+            {
+                // TODO: implementation 
+                return Ok("Doing"); 
+            }
+
+            return Unauthorized($"User not a member in class");
+        }
+
+        [HttpGet("{classId}/grade")]
+        public IActionResult GetAllGradesWithAssignmentInClass(int classId)
+        {
+            int userId = GetCurrentUserId();
+            List<Assignment> assignments = new List<Assignment>();
+            if (IsTeacherInClass(classId))
+            {
+                 assignments =  _classService.GetAllClassAssignmentWithGradeAsTeacher(classId);
+                 return Ok();
+            }
+
+            if(IsStudentInClass(classId))
+            {
+                 assignments =  _classService.GetAllClassAssignmentWithGradeAsStudent(classId, userId);
+                return Ok();
+            }
+
+            return Unauthorized("User not a member in class");
+        }
+
         [HttpPost("{classId}/assignment")]
         public IActionResult AddClassAssignment(int classId, AddAssignmentRequest request)
         {
-            var userId = GetCurrentUserId();
 
             var foundClass = _classService.GetClassDetail(classId);
             if (foundClass is null)
                 return BadRequest("Class does not exists");
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            // check if user is a teacher in class 
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not a teacher in class");
 
             var newAssignment = _classService.AddNewClassAssignment(classId, request.Name, request.Point);
@@ -119,10 +158,7 @@ namespace grade_book_api.Controllers
         [HttpPut("{classId}/assignment/{assignmentId}")]
         public IActionResult UpdateClassAssignment(int classId, int assignmentId, [FromBody] UpdateClassRequest request)
         {
-            var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            // check if user is a teacher in class 
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not a teacher in class");
 
             var updatedAssignment = _classService.UpdateClassAssignment(assignmentId, request.Name, request.Point);
@@ -136,10 +172,7 @@ namespace grade_book_api.Controllers
         public IActionResult UpdateClassAssignmentPriority(int classId,
             [FromBody] UpdateAssignmentPriorityRequest request)
         {
-            var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            // check if user is a teacher in class 
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not a teacher in class");
 
             var resultAssignmentList =
@@ -152,10 +185,7 @@ namespace grade_book_api.Controllers
         [HttpDelete("{classId}/assignment/{assignmentId}")]
         public IActionResult RemoveClassAssignment(int classId, int assignmentId)
         {
-            var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            // check if user is a teacher in class 
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not a teacher in class");
             var result = _classService.RemoveAssignment(assignmentId);
             if (result) return Ok($"Assignment with Id {assignmentId} removed");
@@ -164,19 +194,18 @@ namespace grade_book_api.Controllers
         }
         
         
-        // uploading classstudent 
+        // uploading class student 
         [HttpPost("{classId}/student")]
         public IActionResult BulkAddClassStudent(int classId, BulkAddStudentsToClassRequest request)
         {
-            var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not teacher in class");
             var idNamePair = request.Students.Select(s =>
                 new Tuple<string,string>(s.StudentId,s.FullName)   
             ).ToList();
-            var result = _classService.BulkAddStudentToClass(classId, idNamePair); 
-            return Ok(result.Select(student => new {StudentId = student.StudentIdentification, FullName = student.FullName}));
+            var studentRecords = _classService.BulkAddStudentToClass(classId, idNamePair);
+            if (studentRecords is null) return NotFound();
+            return Ok(studentRecords.Select(student => new {StudentId = student.StudentIdentification, student.FullName}));
         }
 
         //uploading assignment grade
@@ -184,9 +213,7 @@ namespace grade_book_api.Controllers
 
         public IActionResult BulkAddStudentAssignmentGrade(int classId, int assignmentId, BulkAddGradesToAssignmentRequest request)
         {
-            var userId = GetCurrentUserId();
-            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
-            if (userRoleInClass != 1)
+            if (!IsTeacherInClass(classId))
                 return Unauthorized("User not teacher in class");
 
             var idGradePairs = request.Grades
@@ -195,6 +222,7 @@ namespace grade_book_api.Controllers
             try
             {
                 var result = _classService.BulkAddStudentGradeToAssignment(assignmentId, idGradePairs);
+                if (result is null) return NotFound(); 
                 return Ok(result.Select(sGrade => new
                     {sGrade.StudentRecord.StudentIdentification, Grade = sGrade.Point, sGrade.IsFinalized}));
             }
@@ -209,6 +237,21 @@ namespace grade_book_api.Controllers
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             return userId;
+        }
+
+        private bool IsTeacherInClass(int classId)
+        {
+            var userId = GetCurrentUserId();
+            
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            return userRoleInClass == 1;
+        }
+        private bool IsStudentInClass(int classId)
+        {
+            var userId = GetCurrentUserId();
+            
+            var userRoleInClass = _userServices.GetUserRoleInClass(userId, classId);
+            return userRoleInClass == -1;
         }
     }
 }

@@ -22,7 +22,8 @@ namespace ApplicationCore.Services
             IBaseRepository<User> userRepository,
             IBaseRepository<ClassStudentsAccount> classStudentsRepository,
             IBaseRepository<ClassTeachersAccount> classTeacherRepository,
-            IBaseRepository<Assignment> assignmentRepository)
+            IBaseRepository<Assignment> assignmentRepository
+            )
         {
             _logger = logger;
             _classRepository = classRepository;
@@ -209,10 +210,29 @@ namespace ApplicationCore.Services
                 .ToList();
         }
 
+        public List<StudentAssignmentGrade> GetStudentAssignmentGradeAsTeacher(int assignmentId)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId,
+                a =>
+                    a.Include(ass => ass.StudentAssignmentGrades)
+                        .ThenInclude(sGrade => sGrade.StudentRecord));
+
+            if (foundAssignment is null)
+                return null;
+            return foundAssignment.StudentAssignmentGrades.ToList();
+        }
+
+        public List<StudentAssignmentGrade> GetStudentAssignmentGradeAsStudent(int assignmentId)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<StudentRecord> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs)
         {
             var foundClass = _classRepository
                 .GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.Students));
+            if (foundClass is null)
+                return null; 
             foundClass.AddStudents(idNamePairs);
             _classRepository.Update(foundClass);
             return foundClass.Students.ToList();
@@ -225,9 +245,46 @@ namespace ApplicationCore.Services
                     a.Include(ass => ass.StudentAssignmentGrades)
                         .Include(ass => ass.Class)
                         .ThenInclude(c => c.Students));
+            if (foundAssignment is null)
+                return null; 
             foundAssignment.AddStudentGrades(idGradePairs);
             _assignmentRepository.Update(foundAssignment);
             return foundAssignment.StudentAssignmentGrades.ToList();
+        }
+
+        public List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId)
+        {
+            var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
+                cl => cl.Include(c => c.ClassAssignments)
+                    .ThenInclude(a => a.StudentAssignmentGrades));
+
+            if (foundClass is null)
+                return null;
+            return foundClass.ClassAssignments.OrderBy(a => a.Priority)
+                .ThenByDescending(assignment => assignment.Id)
+                .ToList();
+        }
+
+        public List<Assignment> GetAllClassAssignmentWithGradeAsStudent(int classId, int userId)
+        {
+            var foundUser = _userRepository.GetFirst(u => u.Id == userId);
+            if (foundUser is null)
+                return null;
+            var assignments = _assignmentRepository.List(a => a.Class.Id == classId,
+                null, a => a.Include(ass => ass.Class)
+                    .Include(ass => ass.StudentAssignmentGrades).ThenInclude(sg => sg.StudentRecord)).ToList();
+
+            foreach (var assignment in assignments)
+            {
+                var sGrades = assignment.StudentAssignmentGrades.ToList();
+                sGrades = sGrades.Where(sg =>
+                        sg.IsFinalized && sg.StudentRecord.StudentIdentification == foundUser.StudentIdentification)
+                    .ToList();
+                assignment.SetStudentAssignmentGrades(sGrades);
+            }
+
+            return assignments;
+
         }
 
 
