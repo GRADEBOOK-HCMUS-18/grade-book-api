@@ -126,12 +126,15 @@ namespace grade_book_api.Controllers
             if (IsTeacherInClass(classId))
             {
                  assignments =  _classService.GetAllClassAssignmentWithGradeAsTeacher(classId);
-                 return Ok();
+                 var studentRecords = _classService.GetStudentListInClass(classId);
+                 var response = studentRecords.Select(s => new GradeBoardDetailResponse(s, assignments));
+                 return Ok(response);
             }
 
             if(IsStudentInClass(classId))
             {
                  assignments =  _classService.GetAllClassAssignmentWithGradeAsStudent(classId, userId);
+                 
                 return Ok();
             }
 
@@ -205,7 +208,7 @@ namespace grade_book_api.Controllers
             ).ToList();
             var studentRecords = _classService.BulkAddStudentToClass(classId, idNamePair);
             if (studentRecords is null) return NotFound();
-            return Ok(studentRecords.Select(student => new {StudentId = student.StudentIdentification, student.FullName}));
+            return Ok(studentRecords.Select(student => new StudentRecordResponse(student)));
         }
 
         //uploading assignment grade
@@ -222,7 +225,8 @@ namespace grade_book_api.Controllers
             try
             {
                 var result = _classService.BulkAddStudentGradeToAssignment(assignmentId, idGradePairs);
-                if (result is null) return NotFound(); 
+                if (result is null) return NotFound();
+                var studentsInClass = _classService.GetStudentListInClass(classId); 
                 return Ok(result.Select(sGrade => new
                     {sGrade.StudentRecord.StudentIdentification, Grade = sGrade.Point, sGrade.IsFinalized}));
             }

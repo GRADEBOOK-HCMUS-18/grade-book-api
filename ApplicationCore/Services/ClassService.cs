@@ -252,6 +252,14 @@ namespace ApplicationCore.Services
             return foundAssignment.StudentAssignmentGrades.ToList();
         }
 
+        public List<StudentRecord> GetStudentListInClass(int classId)
+        {
+            var foundClass = _classRepository
+                .GetFirst(cl => cl.Id == classId, cl => cl.Include(c => c.Students)); 
+            var studentRecords = foundClass.Students.ToList();
+            return studentRecords;
+        }
+
         public List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId)
         {
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
