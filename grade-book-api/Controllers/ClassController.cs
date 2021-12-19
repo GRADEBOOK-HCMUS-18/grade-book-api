@@ -227,7 +227,6 @@ namespace grade_book_api.Controllers
             {
                 var result = _classService.BulkAddStudentGradeToAssignment(assignmentId, idGradePairs);
                 if (result is null) return NotFound();
-                var studentsInClass = _classService.GetStudentListInClass(classId); 
                 return Ok(result.Select(sGrade => new
                     {sGrade.StudentRecord.StudentIdentification, Grade = sGrade.Point, sGrade.IsFinalized}));
             }

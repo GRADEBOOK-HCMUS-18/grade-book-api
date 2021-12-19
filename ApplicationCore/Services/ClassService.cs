@@ -278,7 +278,7 @@ namespace ApplicationCore.Services
             if (foundClass is null)
                 return null;
             return foundClass.ClassAssignments.OrderBy(a => a.Priority)
-                .ThenByDescending(assignment => assignment.Id)
+                .ThenByDescending(a => a.Id)
                 .ToList();
         }
 
@@ -289,7 +289,9 @@ namespace ApplicationCore.Services
                 return null;
             var assignments = _assignmentRepository.List(a => a.Class.Id == classId,
                 null, a => a.Include(ass => ass.Class)
-                    .Include(ass => ass.StudentAssignmentGrades).ThenInclude(sg => sg.StudentRecord)).ToList();
+                    .Include(ass => ass.StudentAssignmentGrades).ThenInclude(sg => sg.StudentRecord))
+                .OrderBy(a => a.Priority).ThenByDescending(a => a.Id)
+                .ToList();
 
             foreach (var assignment in assignments)
             {
