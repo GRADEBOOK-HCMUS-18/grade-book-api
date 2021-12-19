@@ -11,6 +11,8 @@ namespace grade_book_api.Responses.Class
         public string AssignmentName { get; set; }
         public int AssignmentWeight { get; set; }
         public int? StudentPoint { get; set; }
+        
+        public bool IsFinal { get; set; }
     }
     public class GradeBoardDetailResponse
     {
@@ -33,8 +35,9 @@ namespace grade_book_api.Responses.Class
                 {
                     var result = sGrades
                         .FirstOrDefault(sg =>
-                            sg.StudentRecordId == studentRecord.RecordId && sg.AssignmentId == assignment.Id && sg.IsFinalized);
+                            sg.StudentRecordId == studentRecord.RecordId && sg.AssignmentId == assignment.Id);
                     toAdd.StudentPoint = result?.Point;
+                    toAdd.IsFinal = (result is null) ? false : result.IsFinalized;
                 
                     Grades.Add(toAdd);
                     
