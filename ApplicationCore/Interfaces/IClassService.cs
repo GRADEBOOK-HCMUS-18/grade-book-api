@@ -34,7 +34,9 @@ namespace ApplicationCore.Interfaces
         List<StudentAssignmentGrade> BulkAddStudentGradeToAssignment(int assignmentId,
             List<Tuple<string, int>> idGradePairs);
         
-        List<StudentRecord> GetStudentListInClass(int classId); 
+        List<StudentRecord> GetStudentListInClass(int classId);
+
+        StudentRecord GetStudentRecordOfUserInClass(int userId, int classId); 
 
         List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId);
         List<Assignment> GetAllClassAssignmentWithGradeAsStudent(int classId, int userId);

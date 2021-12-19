@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ApplicationCore.Entity;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace grade_book_api.Responses.Class
 {
@@ -19,20 +20,25 @@ namespace grade_book_api.Responses.Class
 
         public GradeBoardDetailResponse(StudentRecord studentRecord, List<Assignment> assignments)
         {
-            Student = new StudentRecordResponse(studentRecord);
+            Student = (studentRecord is not null) ? new StudentRecordResponse(studentRecord) : null;
             foreach (var assignment in assignments)
             {
                 var toAdd = new ShortStudentGradeResponse();
                 var sGrades = assignment.StudentAssignmentGrades.ToList();
-                var result = sGrades
-                    .FirstOrDefault(sg =>
-                        sg.StudentRecordId == studentRecord.RecordId && sg.AssignmentId == assignment.Id);
+
                 toAdd.AssigmentId = assignment.Id;
                 toAdd.AssignmentName = assignment.Name;
                 toAdd.AssignmentWeight = assignment.Weight;
-                toAdd.StudentPoint = result?.Point;
+                if (studentRecord is not null)
+                {
+                    var result = sGrades
+                        .FirstOrDefault(sg =>
+                            sg.StudentRecordId == studentRecord.RecordId && sg.AssignmentId == assignment.Id && sg.IsFinalized);
+                    toAdd.StudentPoint = result?.Point;
                 
-                Grades.Add(toAdd);
+                    Grades.Add(toAdd);
+                    
+                }
             }
         }
     }

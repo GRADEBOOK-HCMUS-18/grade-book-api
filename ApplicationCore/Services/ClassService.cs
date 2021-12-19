@@ -260,6 +260,15 @@ namespace ApplicationCore.Services
             return studentRecords;
         }
 
+        public StudentRecord GetStudentRecordOfUserInClass(int userId, int classId)
+        {
+            var studentsInClass = GetStudentListInClass(classId);
+            var foundUser = _userRepository.GetFirst(u => u.Id == userId);
+            var foundStudentRecord =
+                studentsInClass.FirstOrDefault(s => s.StudentIdentification == foundUser.StudentIdentification);
+            return foundStudentRecord;
+        }
+
         public List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId)
         {
             var foundClass = _classRepository.GetFirst(cl => cl.Id == classId,
@@ -286,7 +295,7 @@ namespace ApplicationCore.Services
             {
                 var sGrades = assignment.StudentAssignmentGrades.ToList();
                 sGrades = sGrades.Where(sg =>
-                        sg.IsFinalized && sg.StudentRecord.StudentIdentification == foundUser.StudentIdentification)
+                         sg.StudentRecord.StudentIdentification == foundUser.StudentIdentification)
                     .ToList();
                 assignment.SetStudentAssignmentGrades(sGrades);
             }

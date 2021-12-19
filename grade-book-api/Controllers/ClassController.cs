@@ -133,9 +133,10 @@ namespace grade_book_api.Controllers
 
             if(IsStudentInClass(classId))
             {
+                 var studentRecord = _classService.GetStudentRecordOfUserInClass(userId, classId);
                  assignments =  _classService.GetAllClassAssignmentWithGradeAsStudent(classId, userId);
-                 
-                return Ok();
+                 var response = new GradeBoardDetailResponse(studentRecord, assignments); 
+                 return Ok(response);
             }
 
             return Unauthorized("User not a member in class");
