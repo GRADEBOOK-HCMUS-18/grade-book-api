@@ -118,7 +118,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
                 {
-                    b.Property<int>("StudentAssignmentGradeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
@@ -135,7 +135,7 @@ namespace Infrastructure.Migrations
                     b.Property<int>("StudentRecordId")
                         .HasColumnType("integer");
 
-                    b.HasKey("StudentAssignmentGradeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AssignmentId");
 

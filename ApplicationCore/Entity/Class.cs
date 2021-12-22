@@ -50,7 +50,13 @@ namespace ApplicationCore.Entity
 
             foreach (var student in toAdd)
             {
-                this.Students.Add(student);
+                Students.Add(student);
+            }
+        }
+        public void SetAllAssignmentFinalizeStatus(bool newStatus){
+            foreach (var assignment in ClassAssignments)
+            {
+                assignment.SetAllFinalizedStatus(newStatus);
             }
         }
     }

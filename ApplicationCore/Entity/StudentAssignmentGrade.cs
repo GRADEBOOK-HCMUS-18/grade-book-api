@@ -1,8 +1,7 @@
 namespace ApplicationCore.Entity
 {
-    public class StudentAssignmentGrade
+    public class StudentAssignmentGrade: BaseEntity
     {
-        public int StudentAssignmentGradeId { get; set; }
         public int StudentRecordId;
         public StudentRecord StudentRecord { get; set; }
         public int AssignmentId { get; set; }

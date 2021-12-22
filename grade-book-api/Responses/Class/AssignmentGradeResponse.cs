@@ -12,7 +12,7 @@ namespace grade_book_api.Responses.Class
 
         public AssignmentGradeResponse(StudentAssignmentGrade source)
         {
-            StudentAssignmentGradeId = source.StudentAssignmentGradeId;
+            StudentAssignmentGradeId = source.Id;
             StudentId = source.StudentRecord.StudentIdentification;
             Point = source.Point;
             IsFinalized = source.IsFinalized;

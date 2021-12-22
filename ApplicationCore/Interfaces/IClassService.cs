@@ -25,7 +25,6 @@ namespace ApplicationCore.Interfaces
         List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder);
 
         List<StudentAssignmentGrade> GetStudentAssignmentGradeAsTeacher(int assignmentId);
-        List<StudentAssignmentGrade> GetStudentAssignmentGradeAsStudent(int assignmentId);
         
         
 
@@ -40,5 +39,12 @@ namespace ApplicationCore.Interfaces
 
         List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId);
         List<Assignment> GetAllClassAssignmentWithGradeAsStudent(int classId, int userId);
+        
+        // update assignments finalization and point
+        Assignment UpdateAssignmentFinalization(int assignmentId, bool newStatus);
+        List<Assignment> UpdateWholeClassAssignmentFinalization(int classId, bool newStatus);
+
+        StudentAssignmentGrade UpdateStudentAssignmentGrade(int assignmentId, string studentIdentification, bool newStatus,
+            int newPoint); 
     }
 }

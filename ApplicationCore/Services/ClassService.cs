@@ -16,13 +16,15 @@ namespace ApplicationCore.Services
         private readonly IBaseRepository<ClassTeachersAccount> _classTeacherRepository;
         private readonly ILogger<ClassService> _logger;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<StudentAssignmentGrade> _sGradeRepository; 
 
         public ClassService(ILogger<ClassService> logger,
             IBaseRepository<Class> classRepository,
             IBaseRepository<User> userRepository,
             IBaseRepository<ClassStudentsAccount> classStudentsRepository,
             IBaseRepository<ClassTeachersAccount> classTeacherRepository,
-            IBaseRepository<Assignment> assignmentRepository
+            IBaseRepository<Assignment> assignmentRepository,
+            IBaseRepository<StudentAssignmentGrade> sGradeRepository
             )
         {
             _logger = logger;
@@ -31,6 +33,7 @@ namespace ApplicationCore.Services
             _classStudentsRepository = classStudentsRepository;
             _classTeacherRepository = classTeacherRepository;
             _assignmentRepository = assignmentRepository;
+            _sGradeRepository = sGradeRepository; 
         }
 
         public Class GetClassDetail(int classId)
@@ -222,10 +225,7 @@ namespace ApplicationCore.Services
             return foundAssignment.StudentAssignmentGrades.ToList();
         }
 
-        public List<StudentAssignmentGrade> GetStudentAssignmentGradeAsStudent(int assignmentId)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public List<StudentRecord> BulkAddStudentToClass(int classId, List<Tuple<string,string>> idNamePairs)
         {
@@ -248,6 +248,7 @@ namespace ApplicationCore.Services
             if (foundAssignment is null)
                 return null; 
             foundAssignment.AddStudentGrades(idGradePairs);
+            foundAssignment.SetAllFinalizedStatus(false);
             _assignmentRepository.Update(foundAssignment);
             return foundAssignment.StudentAssignmentGrades.ToList();
         }
@@ -304,6 +305,42 @@ namespace ApplicationCore.Services
 
             return assignments;
 
+        }
+
+        public Assignment UpdateAssignmentFinalization(int assignmentId, bool newStatus)
+        {
+            var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId,
+                a => a.Include(ass => ass.StudentAssignmentGrades)); 
+            
+            foundAssignment.SetAllFinalizedStatus(newStatus);
+            _assignmentRepository.Update(foundAssignment);
+            return foundAssignment;
+        }
+
+        public List<Assignment> UpdateWholeClassAssignmentFinalization(int classId, bool newStatus)
+        {
+            var foundClass = _classRepository.GetFirst(c => c.Id == classId,
+                c => c.Include(cl => cl.ClassAssignments)
+                    .ThenInclude(a => a.StudentAssignmentGrades)); 
+            foundClass.SetAllAssignmentFinalizeStatus(newStatus);
+            _classRepository.Update(foundClass);
+            return foundClass.ClassAssignments.OrderBy(a => a.Priority).ThenByDescending(a => a.Id).ToList(); 
+        }
+
+        public StudentAssignmentGrade UpdateStudentAssignmentGrade(int assignmentId, string studentIdentification, bool newStatus,
+            int newPoint)
+        {
+            var foundSGrade = _sGradeRepository.GetFirst(sg => sg.AssignmentId == assignmentId
+                                                               && sg.StudentRecord.StudentIdentification ==
+                                                               studentIdentification,
+                sGrade => sGrade.Include(sg => sg.StudentRecord));
+
+            foundSGrade.Point = newPoint;
+            foundSGrade.IsFinalized = newStatus;
+
+            _sGradeRepository.Update(foundSGrade);
+
+            return foundSGrade;
         }
 
 

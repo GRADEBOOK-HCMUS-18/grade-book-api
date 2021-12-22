@@ -43,5 +43,13 @@ namespace ApplicationCore.Entity
                 StudentAssignmentGrades.Add(sGrade);
             }
         }
+
+        public void SetAllFinalizedStatus(bool newStatus)
+        {
+            foreach (var sGrade in StudentAssignmentGrades)
+            {
+                sGrade.IsFinalized = newStatus;
+            }
+        }
     }
 }

@@ -98,25 +98,7 @@ namespace grade_book_api.Controllers
             return Ok(foundList.Select(e => new AssignmentInformationResponse(e)));
         }
 
-        [HttpGet("{classId}/assignment/{assignmentId}")]
-        public IActionResult GetAssignmentGradeDetail(int classId, int assignmentId)
-        {
-            
-            if (IsTeacherInClass(classId)) // teacher
-            {
-                var result = _classService.GetStudentAssignmentGradeAsTeacher(assignmentId);
-                var response = result.Select(sGrade => new AssignmentGradeResponse(sGrade));
-                return Ok(response); 
-            }
-
-            if(IsStudentInClass(classId)) // student
-            {
-                // TODO: implementation 
-                return Ok("Doing"); 
-            }
-
-            return Unauthorized($"User not a member in class");
-        }
+   
 
         [HttpGet("{classId}/grade")]
         public IActionResult GetAllGradesWithAssignmentInClass(int classId)
@@ -190,14 +172,33 @@ namespace grade_book_api.Controllers
         public IActionResult RemoveClassAssignment(int classId, int assignmentId)
         {
             if (!IsTeacherInClass(classId))
-                return Unauthorized("User not a teacher in class");
+                return Unauthorized("User not a teacher in class"); 
             var result = _classService.RemoveAssignment(assignmentId);
             if (result) return Ok($"Assignment with Id {assignmentId} removed");
 
             return BadRequest("Error while removing");
         }
-        
-        
+
+        [HttpPut("{classId}/assignment/{assignmentId}/finalization")]
+        public IActionResult UpdateAssignmentFinalization(int classId, int assignmentId, UpdateAssignmentFinalizationRequest request)
+        {
+            
+            if (!IsTeacherInClass(classId))
+                return Unauthorized("User not a teacher in class");
+            _ = _classService.UpdateAssignmentFinalization(assignmentId,request.NewStatus); 
+            return Ok();
+        }
+
+        [HttpPut("{classId}/finalization")]
+        public IActionResult UpdateWholeClassAssignmentFinalization(int classId, UpdateAssignmentFinalizationRequest request)
+        {
+            if (!IsTeacherInClass(classId))
+                return Unauthorized("User not a teacher in class");
+            _ = _classService.UpdateWholeClassAssignmentFinalization(classId, request.NewStatus);
+            return Ok();
+        }   
+
+
         // uploading class student 
         [HttpPost("{classId}/student")]
         public IActionResult BulkAddClassStudent(int classId, BulkAddStudentsToClassRequest request)
@@ -213,7 +214,7 @@ namespace grade_book_api.Controllers
         }
 
         //uploading assignment grade
-        [HttpPost("{classId}/assignment/{assignmentId}/grades")]
+        [HttpPost("{classId}/assignment/{assignmentId}/grade")]
 
         public IActionResult BulkAddStudentAssignmentGrade(int classId, int assignmentId, BulkAddGradesToAssignmentRequest request)
         {
@@ -234,6 +235,15 @@ namespace grade_book_api.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpPut("{classId}/assignment/{assignmentId}/grade")]
+        public IActionResult UpdateSingleStudentGrade(int classId, int assignmentId)
+        {
+            // TODO: implementation
+            if (!IsTeacherInClass(classId))
+                return Unauthorized("User not a teacher in class"); 
+            return Ok();
         }
         
 
