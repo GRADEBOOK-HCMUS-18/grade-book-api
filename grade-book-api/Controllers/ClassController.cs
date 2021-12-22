@@ -238,12 +238,15 @@ namespace grade_book_api.Controllers
         }
 
         [HttpPut("{classId}/assignment/{assignmentId}/grade")]
-        public IActionResult UpdateSingleStudentGrade(int classId, int assignmentId)
+        public IActionResult UpdateSingleStudentGrade(int classId, int assignmentId, UpdateSingleStudentGradeRequest request)
         {
-            // TODO: implementation
             if (!IsTeacherInClass(classId))
-                return Unauthorized("User not a teacher in class"); 
-            return Ok();
+                return Unauthorized("User not a teacher in class");
+            var result = _classService.UpdateStudentAssignmentGrade(assignmentId, request.StudentId, request.NewStatus,
+                request.NewPoint);
+            
+            
+            return Ok(new AssignmentGradeResponse(result));
         }
         
 
