@@ -109,7 +109,7 @@ namespace grade_book_api.Controllers
             {
                  assignments =  _classService.GetAllClassAssignmentWithGradeAsTeacher(classId);
                  var studentRecords = _classService.GetStudentListInClass(classId);
-                 var response = studentRecords.Select(s => new GradeBoardDetailResponse(s, assignments));
+                 var response = studentRecords.Select(s => new GradeBoardDetailTeacherResponse(s, assignments));
                  return Ok(response);
             }
 
@@ -117,7 +117,7 @@ namespace grade_book_api.Controllers
             {
                  var studentRecord = _classService.GetStudentRecordOfUserInClass(userId, classId);
                  assignments =  _classService.GetAllClassAssignmentWithGradeAsStudent(classId, userId);
-                 var response = new GradeBoardDetailResponse(studentRecord, assignments); 
+                 var response = new GradeBoardDetailStudentResponse(studentRecord, assignments); 
                  return Ok(response);
             }
 
