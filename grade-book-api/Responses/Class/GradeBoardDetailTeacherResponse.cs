@@ -14,13 +14,13 @@ namespace grade_book_api.Responses.Class
         
         public bool IsFinal { get; set; }
     }
-    public class GradeBoardDetailResponse
+    public class GradeBoardDetailTeacherResponse
     {
         public StudentRecordResponse Student { get; set; }
 
         public List<ShortStudentGradeResponse> Grades { get; set; } = new List<ShortStudentGradeResponse>();
 
-        public GradeBoardDetailResponse(StudentRecord studentRecord, List<Assignment> assignments)
+        public GradeBoardDetailTeacherResponse(StudentRecord studentRecord, List<Assignment> assignments)
         {
             Student = (studentRecord is not null) ? new StudentRecordResponse(studentRecord) : null;
             foreach (var assignment in assignments)
