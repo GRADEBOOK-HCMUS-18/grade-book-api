@@ -16,7 +16,8 @@ namespace ApplicationCore.Services
         private readonly IBaseRepository<ClassTeachersAccount> _classTeacherRepository;
         private readonly ILogger<ClassService> _logger;
         private readonly IBaseRepository<User> _userRepository;
-        private readonly IBaseRepository<StudentAssignmentGrade> _sGradeRepository; 
+        private readonly IBaseRepository<StudentAssignmentGrade> _sGradeRepository;
+        private readonly IBaseRepository<StudentRecord> _studentRecordRepository; 
 
         public ClassService(ILogger<ClassService> logger,
             IBaseRepository<Class> classRepository,
@@ -24,7 +25,8 @@ namespace ApplicationCore.Services
             IBaseRepository<ClassStudentsAccount> classStudentsRepository,
             IBaseRepository<ClassTeachersAccount> classTeacherRepository,
             IBaseRepository<Assignment> assignmentRepository,
-            IBaseRepository<StudentAssignmentGrade> sGradeRepository
+            IBaseRepository<StudentAssignmentGrade> sGradeRepository,
+            IBaseRepository<StudentRecord> studentRecordRepository
             )
         {
             _logger = logger;
@@ -33,7 +35,8 @@ namespace ApplicationCore.Services
             _classStudentsRepository = classStudentsRepository;
             _classTeacherRepository = classTeacherRepository;
             _assignmentRepository = assignmentRepository;
-            _sGradeRepository = sGradeRepository; 
+            _sGradeRepository = sGradeRepository;
+            _studentRecordRepository = studentRecordRepository;
         }
 
         public Class GetClassDetail(int classId)
@@ -334,7 +337,19 @@ namespace ApplicationCore.Services
                                                                && sg.StudentRecord.StudentIdentification ==
                                                                studentIdentification,
                 sGrade => sGrade.Include(sg => sg.StudentRecord));
-
+            if (foundSGrade is null)
+            {
+                var foundStudentRecord =
+                    _studentRecordRepository.GetFirst(sr => sr.StudentIdentification == studentIdentification);
+                // create new student grade
+                var newSGrade = new StudentAssignmentGrade();
+                newSGrade.AssignmentId = assignmentId;
+                newSGrade.IsFinalized = newStatus;
+                newSGrade.Point = newPoint;
+                newSGrade.StudentRecordId = foundStudentRecord.Id;
+                _sGradeRepository.Insert(newSGrade);
+                return newSGrade;
+            }
             foundSGrade.Point = newPoint;
             foundSGrade.IsFinalized = newStatus;
 

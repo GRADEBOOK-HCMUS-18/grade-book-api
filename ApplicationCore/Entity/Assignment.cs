@@ -30,7 +30,7 @@ namespace ApplicationCore.Entity
                 toAdd.Add(new StudentAssignmentGrade
                 {
                     StudentRecord = foundStudentRecord,
-                    StudentRecordId = foundStudentRecord.RecordId,
+                    StudentRecordId = foundStudentRecord.Id,
                     Point = grade,
                     IsFinalized = false,
                     AssignmentId = this.Id

@@ -27,7 +27,7 @@ namespace Infrastructure
             modelBuilder.Entity<ClassTeachersAccount>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             SetupTeacherAccountAndClassRelationship(modelBuilder);
 
-            modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
+            //modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
             SetupClassAndStudentRelationship(modelBuilder);
             SetupAssignmentAndStudentRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
