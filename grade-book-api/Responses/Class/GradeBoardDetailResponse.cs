@@ -35,7 +35,7 @@ namespace grade_book_api.Responses.Class
                 {
                     var result = sGrades
                         .FirstOrDefault(sg =>
-                            sg.StudentRecordId == studentRecord.RecordId && sg.AssignmentId == assignment.Id);
+                            sg.StudentRecordId == studentRecord.Id && sg.AssignmentId == assignment.Id);
                     toAdd.StudentPoint = result?.Point;
                     toAdd.IsFinal = (result is null) ? false : result.IsFinalized;
                 

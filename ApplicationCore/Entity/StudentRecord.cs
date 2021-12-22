@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApplicationCore.Entity
 {
-    public class StudentRecord
+    public class StudentRecord: BaseEntity
     {
-        public int RecordId; 
         public Class Class { get; set; }
         public int ClassId { get; set; }
         public string StudentIdentification { get;set; }
