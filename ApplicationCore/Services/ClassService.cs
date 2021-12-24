@@ -347,7 +347,7 @@ namespace ApplicationCore.Services
             if (foundSGrade is null)
             {
                 var foundStudentRecord =
-                    _studentRecordRepository.GetFirst(sr => sr.StudentIdentification == studentIdentification);
+                    _studentRecordRepository.GetFirst(sr => sr.StudentIdentification == studentIdentification && sr.ClassId == foundAssignment.Class.Id);
                 // create new student grade
                 var newSGrade = new StudentAssignmentGrade();
                 newSGrade.AssignmentId = assignmentId;
