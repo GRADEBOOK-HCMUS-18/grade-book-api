@@ -333,10 +333,17 @@ namespace ApplicationCore.Services
         public StudentAssignmentGrade UpdateStudentAssignmentGrade(int assignmentId, string studentIdentification, bool newStatus,
             int newPoint)
         {
+            var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId, 
+                ass => ass.Include(a => a.Class));
+            
             var foundSGrade = _sGradeRepository.GetFirst(sg => sg.AssignmentId == assignmentId
                                                                && sg.StudentRecord.StudentIdentification ==
-                                                               studentIdentification,
-                sGrade => sGrade.Include(sg => sg.StudentRecord));
+                                                               studentIdentification && sg.Assignment.Class.Id == foundAssignment.Class.Id,
+                sGrade => 
+                    sGrade.Include(sg => sg.StudentRecord)
+                        .Include(sg => sg.Assignment)
+                        .ThenInclude(a => a.Class)
+                    );
             if (foundSGrade is null)
             {
                 var foundStudentRecord =
