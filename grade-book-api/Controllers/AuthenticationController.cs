@@ -4,7 +4,6 @@ using grade_book_api.Requests;
 using grade_book_api.Responses.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace grade_book_api.Controllers
 {
@@ -13,15 +12,13 @@ namespace grade_book_api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserJwtAuthService _authService;
-        private readonly ILogger<AuthenticationController> _logger;
         private readonly IUserServices _userService;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger
-            , IUserJwtAuthService authService
+        public AuthenticationController(
+             IUserJwtAuthService authService
             , IUserServices userService)
         {
             _userService = userService;
-            _logger = logger;
             _authService = authService;
         }
 

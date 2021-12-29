@@ -11,18 +11,19 @@ namespace grade_book_api.Responses.Class
         public string AssignmentName { get; set; }
         public int AssignmentWeight { get; set; }
         public int? StudentPoint { get; set; }
-        
+
         public bool IsFinal { get; set; }
     }
+
     public class GradeBoardDetailTeacherResponse
     {
         public StudentRecordResponse Student { get; set; }
 
-        public List<ShortStudentGradeResponse> Grades { get; set; } = new List<ShortStudentGradeResponse>();
+        public List<ShortStudentGradeResponse> Grades { get; set; } = new();
 
         public GradeBoardDetailTeacherResponse(StudentRecord studentRecord, List<Assignment> assignments)
         {
-            Student = (studentRecord is not null) ? new StudentRecordResponse(studentRecord) : null;
+            Student = studentRecord is not null ? new StudentRecordResponse(studentRecord) : null;
             foreach (var assignment in assignments)
             {
                 var toAdd = new ShortStudentGradeResponse();
@@ -37,10 +38,9 @@ namespace grade_book_api.Responses.Class
                         .FirstOrDefault(sg =>
                             sg.StudentRecordId == studentRecord.Id && sg.AssignmentId == assignment.Id);
                     toAdd.StudentPoint = result?.Point;
-                    toAdd.IsFinal = (result is null) ? false : result.IsFinalized;
-                
+                    toAdd.IsFinal = result is null ? false : result.IsFinalized;
+
                     Grades.Add(toAdd);
-                    
                 }
             }
         }

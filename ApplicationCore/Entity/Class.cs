@@ -16,56 +16,47 @@ namespace ApplicationCore.Entity
         public IList<ClassStudentsAccount> ClassStudentsAccounts { get; set; } = new List<ClassStudentsAccount>();
         public IList<ClassTeachersAccount> ClassTeachersAccounts { get; set; } = new List<ClassTeachersAccount>();
 
-        public IList<StudentRecord> Students { get; set; } = new List<StudentRecord>(); 
+        public IList<StudentRecord> Students { get; set; } = new List<StudentRecord>();
 
         public IList<Assignment> ClassAssignments { get; set; } = new List<Assignment>();
 
 
         public StudentRecord FindStudent(string studentId)
         {
-            return Students.FirstOrDefault(s => s.StudentIdentification == studentId); 
+            return Students.FirstOrDefault(s => s.StudentIdentification == studentId);
         }
 
         public void AddStudents(List<Tuple<string, string>> idNamePairs)
         {
-            
             var toAdd = new List<StudentRecord>();
             foreach (var (item1, item2) in idNamePairs)
             {
                 var foundStudent = Students.FirstOrDefault(student => student.StudentIdentification == item1);
                 if (foundStudent is not null)
-                {
                     foundStudent.FullName = item2;
-                }
                 else
-                {
                     toAdd.Add(new StudentRecord
                     {
-                        ClassId = this.Id,
+                        ClassId = Id,
                         StudentIdentification = item1,
                         FullName = item2
                     });
-                }
             }
 
-            foreach (var student in toAdd)
-            {
-                Students.Add(student);
-            }
+            foreach (var student in toAdd) Students.Add(student);
         }
-        public void SetAllAssignmentFinalizeStatus(bool newStatus){
-            foreach (var assignment in ClassAssignments)
-            {
-                assignment.SetAllFinalizedStatus(newStatus);
-            }
+
+        public void SetAllAssignmentFinalizeStatus(bool newStatus)
+        {
+            foreach (var assignment in ClassAssignments) assignment.SetAllFinalizedStatus(newStatus);
         }
 
         public void UpdateAssignmentsPriority(List<int> newOrder)
         {
             foreach (var assignment in ClassAssignments)
             {
-                   var indexInNewOrder = newOrder.IndexOf(assignment.Id);
-                   if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
+                var indexInNewOrder = newOrder.IndexOf(assignment.Id);
+                if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
             }
         }
     }

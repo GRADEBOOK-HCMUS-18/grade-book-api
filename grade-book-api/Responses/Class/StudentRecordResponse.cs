@@ -10,7 +10,7 @@ namespace grade_book_api.Responses.Class
         public StudentRecordResponse(StudentRecord source)
         {
             StudentId = source.StudentIdentification;
-            FullName = source.FullName; 
+            FullName = source.FullName;
         }
     }
 }

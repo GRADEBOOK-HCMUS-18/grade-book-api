@@ -18,7 +18,7 @@ namespace grade_book_api.Responses.Invitation
             ClassInformation =
                 new ClassShortInformationResponse(inputClass, CurrentRoleInClass, inputClass.MainTeacher);
             IsTeacherInvitation = isTeacherInvitation;
-            IsAlreadyInClass = userRoleInClass != ClassRole.NotAMember; 
+            IsAlreadyInClass = userRoleInClass != ClassRole.NotAMember;
         }
 
         public bool IsAlreadyInClass { get; set; }

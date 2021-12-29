@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace ApplicationCore.Interfaces
 {
-    public interface IBaseRepository<TEntity> where  TEntity: BaseEntity
+    public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     {
         TEntity GetById(int id);
 
@@ -22,7 +22,7 @@ namespace ApplicationCore.Interfaces
 
         IEnumerable<TEntity> ListAll();
 
-        IEnumerable<TEntity> List( Expression<Func<TEntity, bool>> filter = null,
+        IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");
 

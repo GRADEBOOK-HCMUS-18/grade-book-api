@@ -4,7 +4,6 @@ using System.Linq;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using SharedKernel;
 
 namespace ApplicationCore.Services
@@ -13,13 +12,11 @@ namespace ApplicationCore.Services
     {
         private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
-        private readonly ILogger<UserService> _logger;
         private readonly IBaseRepository<User> _userRepository;
 
-        public UserService(ILogger<UserService> logger, IBaseRepository<User> userRepository,
+        public UserService( IBaseRepository<User> userRepository,
             ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository)
         {
-            _logger = logger;
             _userRepository = userRepository;
             _cloudPhotoHandler = cloudPhotoHandler;
             _classRepository = classRepository;
@@ -47,7 +44,6 @@ namespace ApplicationCore.Services
             return found;
         }
 
-        // 1: teacher, 0: not a member, -1: student.
         public ClassRole GetUserRoleInClass(int userId, int classId)
         {
             var foundClass =

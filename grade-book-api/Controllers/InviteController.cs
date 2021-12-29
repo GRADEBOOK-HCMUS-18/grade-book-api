@@ -87,8 +87,8 @@ namespace grade_book_api.Controllers
                 return BadRequest(exception.Message);
             }
         }
-        
-        
+
+
         private int GetCurrentUserIdFromToken()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);

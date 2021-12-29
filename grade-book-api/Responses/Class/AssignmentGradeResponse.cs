@@ -4,7 +4,6 @@ namespace grade_book_api.Responses.Class
 {
     public class AssignmentGradeResponse
     {
-        
         public string StudentId { get; set; }
         public int Point { get; set; }
         public bool IsFinalized { get; set; }

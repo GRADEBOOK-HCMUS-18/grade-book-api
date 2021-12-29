@@ -32,7 +32,6 @@ namespace Infrastructure
             SetupAssignmentAndStudentRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
-            
         }
 
         private static void SetupAssignmentAndStudentRelationship(ModelBuilder modelBuilder)
