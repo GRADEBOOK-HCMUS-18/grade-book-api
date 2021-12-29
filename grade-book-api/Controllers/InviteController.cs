@@ -52,7 +52,7 @@ namespace grade_book_api.Controllers
         [Route("{inviteString}")]
         public IActionResult GetInviteInformation([FromRoute] string inviteString)
         {
-            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var userId = GetCurrentUserIdFromToken();
             _logger.LogInformation($"Received invitation information request for {inviteString}");
             var foundClass = _invitationService.GetClassFromInvitation(inviteString);
             if (foundClass is null) return NotFound("Invitation string does not exist");
@@ -69,7 +69,7 @@ namespace grade_book_api.Controllers
         [Route("{inviteString}")]
         public IActionResult AcceptInvite([FromRoute] string inviteString)
         {
-            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            var userId = GetCurrentUserIdFromToken();
             var foundClass = _invitationService.GetClassFromInvitation(inviteString);
 
             var isTeacherInvite = inviteString == foundClass.InviteStringTeacher;
@@ -86,6 +86,13 @@ namespace grade_book_api.Controllers
             {
                 return BadRequest(exception.Message);
             }
+        }
+        
+        
+        private int GetCurrentUserIdFromToken()
+        {
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            return userId;
         }
     }
 }

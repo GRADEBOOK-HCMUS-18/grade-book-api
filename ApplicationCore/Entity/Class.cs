@@ -59,5 +59,14 @@ namespace ApplicationCore.Entity
                 assignment.SetAllFinalizedStatus(newStatus);
             }
         }
+
+        public void UpdateAssignmentsPriority(List<int> newOrder)
+        {
+            foreach (var assignment in ClassAssignments)
+            {
+                   var indexInNewOrder = newOrder.IndexOf(assignment.Id);
+                   if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
+            }
+        }
     }
 }

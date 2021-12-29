@@ -59,7 +59,7 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult TryLogin([FromBody] AuthenticateRequest request)
         {
-            var foundUser = _userService.GetUserByUsername(request.Email);
+            var foundUser = _userService.GetUserByEmail(request.Email);
 
             if (foundUser is null) return Unauthorized("No user with that username or email");
             var token = _authService.TryGetToken(request.Email, request.Password);
@@ -75,7 +75,7 @@ namespace grade_book_api.Controllers
         public IActionResult TryAuthenticateGoogle([FromBody] GoogleAuthenticateRequest request)
         {
             // check if user existed 
-            var existedUser = _userService.GetUserByUsername(request.Email);
+            var existedUser = _userService.GetUserByEmail(request.Email);
             if (existedUser is null)
                 existedUser = _authService.CreateNewUser("", request.Email, request.FirstName, request.LastName,
                     request.ProfilePictureUrl, request.DefaultProfilePictureHex);

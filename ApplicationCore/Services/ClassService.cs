@@ -143,9 +143,7 @@ namespace ApplicationCore.Services
 
             var newClassTeacherRecord = new ClassTeachersAccount
             {
-                Class = availableClass,
                 ClassId = availableClass.Id,
-                Teacher = foundUser,
                 TeacherId = foundUser.Id
             };
             _classTeacherRepository.Insert(newClassTeacherRecord);
@@ -200,18 +198,12 @@ namespace ApplicationCore.Services
         public List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder)
         {
             var foundClass = GetClassDetail(classId);
-            var currentClassAssignments = foundClass.ClassAssignments;
-
-            foreach (var assignment in currentClassAssignments)
-            {
-                var indexInNewOrder = newOrder.IndexOf(assignment.Id);
-                if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
-            }
+            foundClass.UpdateAssignmentsPriority(newOrder);
             
             // TODO: refactor here 
 
             _classRepository.Update(foundClass);
-            return currentClassAssignments.OrderBy(assignment => assignment.Priority)
+            return foundClass.ClassAssignments.OrderBy(assignment => assignment.Priority)
                 .ThenByDescending(assignment => assignment.Id)
                 .ToList();
         }

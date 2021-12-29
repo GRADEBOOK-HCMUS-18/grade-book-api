@@ -51,8 +51,6 @@ namespace Infrastructure
 
         public TEntity Update(TEntity entity)
         {
-            // _ = _dbSet.Update(entity);
-            // _dbSet.SaveChanges();
 
             _dbSet.Set<TEntity>().Attach(entity);
             _dbSet.Entry(entity).State = EntityState.Modified;

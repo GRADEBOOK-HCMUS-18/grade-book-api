@@ -36,7 +36,7 @@ namespace ApplicationCore.Services
             return found;
         }
 
-        public User GetUserByUsername(string email)
+        public User GetUserByEmail(string email)
         {
             var found = _userRepository.GetFirst(user =>
                 user.Email == email);
@@ -48,7 +48,7 @@ namespace ApplicationCore.Services
         }
 
         // 1: teacher, 0: not a member, -1: student.
-        public int GetUserRoleInClass(int userId, int classId)
+        public ClassRole GetUserRoleInClass(int userId, int classId)
         {
             var foundClass =
                 _classRepository
@@ -58,13 +58,13 @@ namespace ApplicationCore.Services
                 user => user.Include(u => u.ClassStudentsAccounts)
                     .Include(u => u.ClassTeachersAccounts));
 
-            if (foundClass.MainTeacher == foundUser) return 1;
+            if (foundClass.MainTeacher == foundUser) return ClassRole.Teacher;
 
             if (foundUser.ClassTeachersAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
-                return 1;
+                return ClassRole.Teacher;
             if (foundUser.ClassStudentsAccounts.FirstOrDefault(c => c.ClassId == classId) is not null)
-                return -1;
-            return 0;
+                return ClassRole.Student;
+            return ClassRole.NotAMember;
         }
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
