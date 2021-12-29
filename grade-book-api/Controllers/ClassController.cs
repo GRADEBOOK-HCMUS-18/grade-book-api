@@ -51,7 +51,7 @@ namespace grade_book_api.Controllers
         [HttpGet]
         public IActionResult GetClassList()
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserIdFromToken();
             try
             {
                 var mainTeacherClasses = _classService.GetAllClassWithUserBeingMainTeacher(userId);
@@ -78,7 +78,7 @@ namespace grade_book_api.Controllers
         [HttpPost]
         public IActionResult AddNewClass(AddNewClassRequest request)
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserIdFromToken();
 
             // create new class
 
@@ -102,7 +102,7 @@ namespace grade_book_api.Controllers
         [HttpGet("{classId}/grade")]
         public IActionResult GetAllGradesWithAssignmentInClass(int classId)
         {
-            var userId = GetCurrentUserId();
+            var userId = GetCurrentUserIdFromToken();
             var currentUserRole = GetCurrentUserRole(classId);
             if (currentUserRole is ClassRole.Teacher)
             {
@@ -251,7 +251,7 @@ namespace grade_book_api.Controllers
         }
 
 
-        private int GetCurrentUserId()
+        private int GetCurrentUserIdFromToken()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
             return userId;
@@ -259,7 +259,7 @@ namespace grade_book_api.Controllers
 
         private ClassRole GetCurrentUserRole(int classId)
         {
-            return _userServices.GetUserRoleInClass(GetCurrentUserId(), classId);
+            return _userServices.GetUserRoleInClass(GetCurrentUserIdFromToken(), classId);
         }
     }
 }

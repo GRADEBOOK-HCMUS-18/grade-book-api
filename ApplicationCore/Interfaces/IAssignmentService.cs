@@ -6,8 +6,6 @@ namespace ApplicationCore.Interfaces
 {
     public interface IAssignmentService
     {
-        // assignments related
-
         List<Assignment> GetClassAssignments(int classId);
         Assignment AddNewClassAssignment(int classId, string name, int point);
 
@@ -16,11 +14,8 @@ namespace ApplicationCore.Interfaces
         Assignment UpdateClassAssignment(int assignmentId, string newName, int newPoint);
         List<Assignment> UpdateClassAssignmentPriority(int classId, List<int> newOrder);
 
-        List<StudentAssignmentGrade> GetStudentAssignmentGradeAsTeacher(int assignmentId);
-
         List<StudentAssignmentGrade> BulkAddStudentGradeToAssignment(int assignmentId,
             List<Tuple<string, int>> idGradePairs);
-
         List<Assignment> GetAllClassAssignmentWithGradeAsTeacher(int classId);
         List<Assignment> GetAllClassAssignmentWithGradeAsStudent(int classId, int userId);
 

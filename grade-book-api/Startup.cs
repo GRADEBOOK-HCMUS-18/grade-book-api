@@ -75,7 +75,7 @@ namespace grade_book_api
             services.AddScoped(typeof(IBaseRepository<>), typeof(EfRepository<>));
             services.AddScoped<ICloudPhotoHandler, CloudinaryPhotoHandler>();
             services.AddScoped<IInvitationService, InvitationService>();
-            services.AddScoped<IEmailSender, MailKitEmailSender>();
+            services.AddScoped<IEmailSender, MailKitEmailSenderAdapter>();
             services.AddSingleton(Configuration);
             services.AddSingleton(cloudinary);
         }

@@ -3,23 +3,22 @@ using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace Infrastructure
 {
-    public class MailKitEmailSender : IEmailSender
+    public class MailKitEmailSenderAdapter : IEmailSender
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<MailKitEmailSender> _logger;
+        private readonly SmtpClient _smtpClient;
 
-        public MailKitEmailSender(ILogger<MailKitEmailSender> logger, IConfiguration configuration)
+        public MailKitEmailSenderAdapter( IConfiguration configuration)
         {
-            _logger = logger;
             _configuration = configuration;
+            _smtpClient = new SmtpClient();
         }
 
-        public async Task SendEmail(string address, string subject, string htmlMessage)
+        private async Task SendEmail(string address, string subject, string htmlMessage)
         {
             var senderAddress = _configuration["MailSettings:Account"];
             var email = new MimeMessage {Sender = new MailboxAddress("GradeBook", senderAddress)};
@@ -29,17 +28,17 @@ namespace Infrastructure
 
             var builder = new BodyBuilder {HtmlBody = htmlMessage};
             email.Body = builder.ToMessageBody();
-            using var smtp = new SmtpClient();
 
             var stmpHost = _configuration["MailSettings:Host"];
-            await smtp.ConnectAsync(stmpHost);
+            await _smtpClient.ConnectAsync(stmpHost);
             var senderPassword = _configuration["MailSettings:Password"];
-            await smtp.AuthenticateAsync(senderAddress, senderPassword);
-            await smtp.SendAsync(email);
+            await _smtpClient.AuthenticateAsync(senderAddress, senderPassword);
+            await _smtpClient.SendAsync(email);
 
-
-            await smtp.DisconnectAsync(true);
+            await _smtpClient.DisconnectAsync(true);
         }
+
+     
 
         public Task BulkSendEmail(List<string> addresses, string subject, string htmlMessage)
         {

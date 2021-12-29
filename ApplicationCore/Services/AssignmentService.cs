@@ -89,17 +89,7 @@ namespace ApplicationCore.Services
                 .ToList();
         }
 
-        public List<StudentAssignmentGrade> GetStudentAssignmentGradeAsTeacher(int assignmentId)
-        {
-            var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId,
-                a =>
-                    a.Include(ass => ass.StudentAssignmentGrades)
-                        .ThenInclude(sGrade => sGrade.StudentRecord));
-
-            if (foundAssignment is null)
-                return null;
-            return foundAssignment.StudentAssignmentGrades.ToList();
-        }
+  
 
 
         public List<StudentAssignmentGrade> BulkAddStudentGradeToAssignment(int assignmentId,
