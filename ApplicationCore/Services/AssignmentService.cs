@@ -48,7 +48,6 @@ namespace ApplicationCore.Services
             var foundClass = GetClassDetail(classId);
             var newAssignment = new Assignment {Name = name, Weight = point, Priority = 0, Class = foundClass};
 
-
             _assignmentRepository.Insert(newAssignment);
 
             return newAssignment;
@@ -81,7 +80,6 @@ namespace ApplicationCore.Services
         {
             var foundClass = GetClassDetail(classId);
             foundClass.UpdateAssignmentsPriority(newOrder);
-
 
             _classRepository.Update(foundClass);
             return foundClass.ClassAssignments.OrderBy(assignment => assignment.Priority)

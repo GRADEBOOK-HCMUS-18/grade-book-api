@@ -29,8 +29,8 @@ namespace Infrastructure
             var builder = new BodyBuilder {HtmlBody = htmlMessage};
             email.Body = builder.ToMessageBody();
 
-            var stmpHost = _configuration["MailSettings:Host"];
-            await _smtpClient.ConnectAsync(stmpHost);
+            var smtpHost = _configuration["MailSettings:Host"];
+            await _smtpClient.ConnectAsync(smtpHost);
             var senderPassword = _configuration["MailSettings:Password"];
             await _smtpClient.AuthenticateAsync(senderAddress, senderPassword);
             await _smtpClient.SendAsync(email);

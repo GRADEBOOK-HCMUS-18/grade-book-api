@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure
 {
-    public class CloudinaryPhotoHandler : ICloudPhotoHandler
+    public class CloudinaryPhotoHandlerAdapter : ICloudPhotoHandler
     {
         private readonly Cloudinary _cloudinary;
-        private readonly ILogger<CloudinaryPhotoHandler> _logger;
+        private readonly ILogger<CloudinaryPhotoHandlerAdapter> _logger;
 
-        public CloudinaryPhotoHandler(Cloudinary cloudinary, ILogger<CloudinaryPhotoHandler> logger)
+        public CloudinaryPhotoHandlerAdapter(Cloudinary cloudinary, ILogger<CloudinaryPhotoHandlerAdapter> logger)
         {
             _cloudinary = cloudinary;
             _logger = logger;

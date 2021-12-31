@@ -4,7 +4,6 @@ using System.Linq;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace ApplicationCore.Services
 {

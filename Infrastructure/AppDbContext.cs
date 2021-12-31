@@ -17,6 +17,7 @@ namespace Infrastructure
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<StudentRecord> StudentsRecords { get; set; }
         public DbSet<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
+        public DbSet<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +31,7 @@ namespace Infrastructure
             //modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
             SetupClassAndStudentRelationship(modelBuilder);
             SetupAssignmentAndStudentRelationship(modelBuilder);
+            SetupStudentGradeAndReviewRequestRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
         }
@@ -55,6 +57,15 @@ namespace Infrastructure
                 .HasOne(s => s.Class)
                 .WithMany(c => c.Students)
                 .HasForeignKey(cs => cs.ClassId);
+        }
+
+        private static void SetupStudentGradeAndReviewRequestRelationship(ModelBuilder modelBuilder)
+        {
+            // set up one-many between Student Grade and and Review Request
+            modelBuilder.Entity<AssignmentGradeReviewRequest>()
+                .HasOne(r => r.StudentAssignmentGrade)
+                .WithMany(sGrade => sGrade.AssignmentGradeReviewRequests)
+                .HasForeignKey(r => r.StudentAssignmentGradeId);
         }
 
         private static void SetupTeacherAccountAndClassRelationship(ModelBuilder modelBuilder)

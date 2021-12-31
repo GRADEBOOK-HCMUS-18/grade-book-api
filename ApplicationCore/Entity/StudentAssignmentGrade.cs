@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ApplicationCore.Entity
 {
     public class StudentAssignmentGrade : BaseEntity
@@ -9,5 +11,7 @@ namespace ApplicationCore.Entity
         public int Point { get; set; }
 
         public bool IsFinalized { get; set; }
+        
+        public List<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; }
     }
 }
