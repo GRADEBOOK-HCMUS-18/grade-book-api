@@ -3,18 +3,18 @@ using grade_book_api.Responses.User;
 
 namespace grade_book_api.Responses.Class
 {
-    public class AddGradeReviewResponse
+    public class GradeReviewInformationResponse
     {
         
         public int RequestedNewPoint { get; set; }
         public string Description { get; set; }
         public string State { get; set; }
         public AssignmentGradeResponse CurrentGrade { get; set; }
-        public UserInformationResponse User { get; set; }
+        public StudentRecordResponse Student { get; set; }
 
 
-        public AddGradeReviewResponse(AssignmentGradeReviewRequest sourceRequest
-            , ApplicationCore.Entity.User sourceUser )
+        public GradeReviewInformationResponse(AssignmentGradeReviewRequest sourceRequest
+           )
         {
             RequestedNewPoint = sourceRequest.RequestedNewPoint;
             Description = sourceRequest.Description;
@@ -26,7 +26,7 @@ namespace grade_book_api.Responses.Class
                 _ => "Waiting"
             };
             CurrentGrade = new AssignmentGradeResponse(sourceRequest.StudentAssignmentGrade);
-            User = new UserInformationResponse(sourceUser);
+            Student = new StudentRecordResponse(sourceRequest.StudentAssignmentGrade.StudentRecord);
         }
     }
 }

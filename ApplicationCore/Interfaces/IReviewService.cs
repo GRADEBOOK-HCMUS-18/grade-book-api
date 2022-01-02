@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ApplicationCore.Entity;
 
 namespace ApplicationCore.Interfaces
@@ -7,6 +8,10 @@ namespace ApplicationCore.Interfaces
         AssignmentGradeReviewRequest AddReviewRequest(int assignmentId
             , int userId
             , int requestedPoint
-            , string description); 
+            , string description);
+
+        List<AssignmentGradeReviewRequest> GetReviewRequestsAsTeacher( int classId);
+
+        List<AssignmentGradeReviewRequest> GetReviewRequestsAsStudent(int classId, string studentIdentification);
     }
 }

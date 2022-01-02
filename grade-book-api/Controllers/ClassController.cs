@@ -253,6 +253,27 @@ namespace grade_book_api.Controllers
             return Ok(new AssignmentGradeResponse(result));
         }
 
+        [HttpGet("{classId}/review")]
+        public IActionResult GetAllGradeReviewInClass(int classId)
+        {
+            var currentRole = GetCurrentUserRole(classId);
+            if (currentRole is ClassRole.Teacher)
+            {
+                var reviews = _reviewService.GetReviewRequestsAsTeacher(classId);
+                return Ok(reviews.Select(review => new GradeReviewInformationResponse(review))); 
+            }
+
+            if (currentRole is ClassRole.Student)
+            {
+                var currentUserStudentId = GetCurrentUserStudentId();
+            
+                var reviews = _reviewService.GetReviewRequestsAsStudent(classId,currentUserStudentId);
+                return Ok(reviews.Select(review => new GradeReviewInformationResponse(review))); 
+            }
+
+            return Unauthorized(); 
+        }
+
         [HttpPost("{classId}/assignment/{assignmentId}/review")]
         public IActionResult AddGradeViewRequest(int classId, int assignmentId, AddNewGradeReviewRequest request)
         {
@@ -272,7 +293,7 @@ namespace grade_book_api.Controllers
                         request.RequestedNewPoint, 
                         request.Description);
                 if (newReview is null) return BadRequest("No grade for student in class"); 
-                return Ok(new AddGradeReviewResponse(newReview,user));
+                return Ok(new GradeReviewInformationResponse(newReview));
             }
             catch (Exception ex)
             {
@@ -292,6 +313,13 @@ namespace grade_book_api.Controllers
         private ClassRole GetCurrentUserRole(int classId)
         {
             return _userServices.GetUserRoleInClass(GetCurrentUserIdFromToken(), classId);
+        }
+
+        private string GetCurrentUserStudentId()
+        {
+            var userId = GetCurrentUserIdFromToken();
+            string currentStudentIdentification = _userServices.GetUserById(userId).StudentIdentification;
+            return currentStudentIdentification;
         }
     }
 }

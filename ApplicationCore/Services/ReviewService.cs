@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +52,37 @@ namespace ApplicationCore.Services
 
 
             return _reviewRepository.Insert(newReview);
+        }
+
+        public List<AssignmentGradeReviewRequest> GetReviewRequestsAsTeacher(int classId)
+        {
+            var foundSGrades = _sGradeRepository.List(
+                sg => sg.Assignment.Class.Id == classId,
+                null,
+                sg => sg.Include(sGrade => sGrade.AssignmentGradeReviewRequests)
+                    .Include(sGrade => sGrade.StudentRecord)
+                    .Include(sGrade => sGrade.Assignment)
+                    .ThenInclude(a => a.Class)
+                ).ToList();
+            
+            var reviews = foundSGrades.SelectMany(sGrade => sGrade.AssignmentGradeReviewRequests);
+            return reviews.ToList(); 
+
+        }
+
+        public List<AssignmentGradeReviewRequest> GetReviewRequestsAsStudent(int classId, string studentIdentification)
+        {
+            var foundSGrades = _sGradeRepository.List(
+                sg => sg.Assignment.Class.Id == classId &&
+                      sg.StudentRecord.StudentIdentification == studentIdentification,
+                null,
+                sg => sg.Include(sGrade => sGrade.AssignmentGradeReviewRequests)
+                    .Include(sGrade => sGrade.StudentRecord)
+                    .Include(sGrade => sGrade.Assignment)
+                    .ThenInclude(a => a.Class)
+            ).ToList();
+            var reviews = foundSGrades.SelectMany(sGrade => sGrade.AssignmentGradeReviewRequests);
+            return reviews.ToList(); 
         }
     }
 }
