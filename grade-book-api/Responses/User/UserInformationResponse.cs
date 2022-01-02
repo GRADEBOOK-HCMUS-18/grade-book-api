@@ -10,6 +10,7 @@ namespace grade_book_api.Responses.User
             ProfilePictureUrl = source.ProfilePictureUrl;
             DefaultProfilePictureHex = source.DefaultProfilePictureHex;
             StudentIdentification = source.StudentIdentification;
+            IsLocked = source.IsLocked;
         }
 
         public string Email { get; set; }
@@ -19,5 +20,7 @@ namespace grade_book_api.Responses.User
         public string ProfilePictureUrl { get; set; }
 
         public string DefaultProfilePictureHex { get; set; }
+        
+        public bool IsLocked { get; set; }
     }
 }

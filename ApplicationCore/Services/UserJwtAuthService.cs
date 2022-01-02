@@ -27,6 +27,7 @@ namespace ApplicationCore.Services
         {
             var foundUser =
                 _repository.GetFirst(user => user.Email == email);
+
             if (foundUser is null)
                 return null;
             var success = PasswordHelper

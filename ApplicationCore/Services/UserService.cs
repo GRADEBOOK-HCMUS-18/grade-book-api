@@ -8,7 +8,7 @@ using SharedKernel;
 
 namespace ApplicationCore.Services
 {
-    public class UserService : IUserServices
+    public class UserService : IUserServices //TODO: refractor user services 
     {
         private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
@@ -84,7 +84,7 @@ namespace ApplicationCore.Services
                 var foundExistedStudent =
                     _userRepository.GetFirst(user => user.StudentIdentification == newStudentIdentification);
                 if (foundExistedStudent is not null)
-                    throw new ApplicationException($"Student with {newStudentIdentification} already exists");
+                    throw new ApplicationException($"Student with student Id {newStudentIdentification} already exists");
 
                 found.StudentIdentification = newStudentIdentification;
             }

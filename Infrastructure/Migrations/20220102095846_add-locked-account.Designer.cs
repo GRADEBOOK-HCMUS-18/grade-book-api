@@ -3,15 +3,17 @@ using System;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220102095846_add-locked-account")]
+    partial class addlockedaccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,29 +144,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("ClassTeachersAccounts");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.GradeReviewReply", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("AssignmentGradeReviewRequestId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignmentGradeReviewRequestId");
-
-                    b.ToTable("GradeReviewReply");
-                });
-
             modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
                 {
                     b.Property<int>("Id")
@@ -258,29 +237,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.UserNotification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserNotifications");
-                });
-
             modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
                 {
                     b.HasOne("ApplicationCore.Entity.Class", "Class")
@@ -350,17 +306,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.GradeReviewReply", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.AssignmentGradeReviewRequest", "AssignmentGradeReviewRequest")
-                        .WithMany("GradeReviewReplies")
-                        .HasForeignKey("AssignmentGradeReviewRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AssignmentGradeReviewRequest");
-                });
-
             modelBuilder.Entity("ApplicationCore.Entity.StudentAssignmentGrade", b =>
                 {
                     b.HasOne("ApplicationCore.Entity.Assignment", "Assignment")
@@ -391,25 +336,9 @@ namespace Infrastructure.Migrations
                     b.Navigation("Class");
                 });
 
-            modelBuilder.Entity("ApplicationCore.Entity.UserNotification", b =>
-                {
-                    b.HasOne("ApplicationCore.Entity.User", "User")
-                        .WithMany("UserNotifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ApplicationCore.Entity.Assignment", b =>
                 {
                     b.Navigation("StudentAssignmentGrades");
-                });
-
-            modelBuilder.Entity("ApplicationCore.Entity.AssignmentGradeReviewRequest", b =>
-                {
-                    b.Navigation("GradeReviewReplies");
                 });
 
             modelBuilder.Entity("ApplicationCore.Entity.Class", b =>
@@ -438,8 +367,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("ClassStudentsAccounts");
 
                     b.Navigation("ClassTeachersAccounts");
-
-                    b.Navigation("UserNotifications");
                 });
 #pragma warning restore 612, 618
         }

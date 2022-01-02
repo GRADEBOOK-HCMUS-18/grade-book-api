@@ -18,6 +18,7 @@ namespace Infrastructure
         public DbSet<StudentRecord> StudentsRecords { get; set; }
         public DbSet<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
         public DbSet<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,8 @@ namespace Infrastructure
             SetupClassAndStudentRelationship(modelBuilder);
             SetupAssignmentAndStudentRelationship(modelBuilder);
             SetupStudentGradeAndReviewRequestRelationship(modelBuilder);
+            SetupUserAndNotificationRelationship(modelBuilder);
+            SetupAssignmentGradeReviewAndReplyRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
         }
@@ -57,6 +60,23 @@ namespace Infrastructure
                 .HasOne(s => s.Class)
                 .WithMany(c => c.Students)
                 .HasForeignKey(cs => cs.ClassId);
+        }
+
+        private static void SetupUserAndNotificationRelationship(ModelBuilder modelBuilder)
+        {
+            // set-up one-many between User and Notifications 
+            modelBuilder.Entity<UserNotification>()
+                .HasOne(n => n.User)
+                .WithMany(u => u.UserNotifications)
+                .HasForeignKey(n => n.UserId);
+        }
+
+        private static void SetupAssignmentGradeReviewAndReplyRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GradeReviewReply>()
+                .HasOne(reply => reply.AssignmentGradeReviewRequest)
+                .WithMany(r => r.GradeReviewReplies)
+                .HasForeignKey(reply => reply.AssignmentGradeReviewRequestId);
         }
         
 

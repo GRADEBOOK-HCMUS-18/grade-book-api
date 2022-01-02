@@ -11,6 +11,7 @@ namespace grade_book_api.Responses.User
             DefaultProfilePictureHex = source.DefaultProfilePictureHex;
             IsPasswordNotSet = source.IsPasswordNotSet;
             StudentIdentification = source.StudentIdentification;
+            IsLocked = source.IsLocked;
         }
 
         public string Email { get; set; }
@@ -21,5 +22,7 @@ namespace grade_book_api.Responses.User
 
         public string DefaultProfilePictureHex { get; set; }
         public bool IsPasswordNotSet { get; set; }
+        
+        public bool IsLocked { get; set; }
     }
 }

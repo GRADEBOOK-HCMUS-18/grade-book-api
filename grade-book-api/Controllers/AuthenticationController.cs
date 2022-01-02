@@ -57,8 +57,11 @@ namespace grade_book_api.Controllers
         public IActionResult TryLogin([FromBody] AuthenticateRequest request)
         {
             var foundUser = _userService.GetUserByEmail(request.Email);
+        
 
             if (foundUser is null) return Unauthorized("No user with that username or email");
+            if (foundUser.IsLocked)
+                return Unauthorized("Your account is locked");
             var token = _authService.TryGetToken(request.Email, request.Password);
             if (token is null)
                 return Unauthorized("Wrong credential");

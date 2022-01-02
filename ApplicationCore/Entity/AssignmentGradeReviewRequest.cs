@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ApplicationCore.Entity
 {
     public enum ReviewRequestState
@@ -14,7 +16,9 @@ namespace ApplicationCore.Entity
         public int RequestedNewPoint {get;set;}
         public string Description { get; set; }
 
-        public ReviewRequestState RequestState { get; set; } = ReviewRequestState.Waiting; 
+        public ReviewRequestState RequestState { get; set; } = ReviewRequestState.Waiting;
+
+        public List<GradeReviewReply> GradeReviewReplies { get; set; } = new List<GradeReviewReply>();
 
         private void ChangeState(ReviewRequestState newState)
         {
