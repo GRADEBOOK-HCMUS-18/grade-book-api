@@ -76,6 +76,11 @@ namespace grade_book_api.Controllers
         {
             // check if user existed 
             var existedUser = _userService.GetUserByEmail(request.Email);
+            if (existedUser is not null)
+            {
+                if (existedUser.IsLocked)
+                    return Unauthorized("Your account is locked"); 
+            }
             if (existedUser is null)
                 existedUser = _authService.CreateNewUser("", request.Email, request.FirstName, request.LastName,
                     request.ProfilePictureUrl, request.DefaultProfilePictureHex);
