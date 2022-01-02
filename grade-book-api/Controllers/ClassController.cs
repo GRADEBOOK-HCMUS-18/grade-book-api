@@ -18,15 +18,18 @@ namespace grade_book_api.Controllers
         private readonly IClassService _classService;
         private readonly IUserServices _userServices;
         private readonly IAssignmentService _assignmentService;
+        private readonly IReviewService _reviewService;
 
         public ClassController(
             IClassService classService,
             IUserServices userServices,
-            IAssignmentService assignmentService)
+            IAssignmentService assignmentService,
+            IReviewService reviewService)
         {
             _classService = classService;
             _userServices = userServices;
             _assignmentService = assignmentService;
+            _reviewService = reviewService;
         }
 
         [HttpGet]
@@ -248,6 +251,35 @@ namespace grade_book_api.Controllers
 
 
             return Ok(new AssignmentGradeResponse(result));
+        }
+
+        [HttpPost("{classId}/assignment/{assignmentId}/review")]
+        public IActionResult AddGradeViewRequest(int classId, int assignmentId, AddNewGradeReviewRequest request)
+        {
+            var currentUserRole = GetCurrentUserRole(classId);
+            if (currentUserRole is not ClassRole.Student)
+               return Unauthorized("Only student in class allowed");
+            try
+            {
+                var user = _userServices.GetUserById(GetCurrentUserIdFromToken());
+                if (string.IsNullOrEmpty(user.StudentIdentification))
+                {
+                   return Unauthorized("Only student with studentId is allowed to raise a grade review");
+                }
+                var newReview = _reviewService
+                    .AddReviewRequest(assignmentId, 
+                        GetCurrentUserIdFromToken(), 
+                        request.RequestedNewPoint, 
+                        request.Description);
+                if (newReview is null) return BadRequest("No grade for student in class"); 
+                return Ok(new AddGradeReviewResponse(newReview,user));
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+
+        
         }
 
 

@@ -12,6 +12,7 @@ namespace ApplicationCore.Entity
         public StudentAssignmentGrade StudentAssignmentGrade { get; set; }
         
         public int RequestedNewPoint {get;set;}
+        public string Description { get; set; }
 
         public ReviewRequestState RequestState { get; set; } = ReviewRequestState.Waiting; 
 

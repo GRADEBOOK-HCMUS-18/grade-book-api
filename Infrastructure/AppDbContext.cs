@@ -58,6 +58,7 @@ namespace Infrastructure
                 .WithMany(c => c.Students)
                 .HasForeignKey(cs => cs.ClassId);
         }
+        
 
         private static void SetupStudentGradeAndReviewRequestRelationship(ModelBuilder modelBuilder)
         {

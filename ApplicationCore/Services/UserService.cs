@@ -44,6 +44,13 @@ namespace ApplicationCore.Services
             return found;
         }
 
+        public User GetUserByStudentIdentification(string studentIdentification)
+        {
+            var found = _userRepository.GetFirst(user => user.StudentIdentification == studentIdentification);
+            if (found is null) return null;
+            return found; 
+        }
+
         public ClassRole GetUserRoleInClass(int userId, int classId)
         {
             var foundClass =
