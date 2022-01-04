@@ -14,7 +14,9 @@ namespace ApplicationCore.Interfaces
 
         List<AssignmentGradeReviewRequest> GetReviewRequestsAsStudent(int classId, string studentIdentification);
 
-        GradeReviewReply AddReviewReplyAsTeacher(int userId, int requestId, string content);
-        GradeReviewReply AddReviewReplyAsStudent(int userId, int requestId, string content); 
+        GradeReviewReply AddReviewReplyAsTeacher(int userId, int reviewId, string content);
+        GradeReviewReply AddReviewReplyAsStudent(int userId, int reviewId, string content);
+
+        void UpdateGradeReviewState(int reviewId, string newState); 
     }
 }

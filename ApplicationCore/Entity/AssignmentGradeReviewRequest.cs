@@ -35,7 +35,10 @@ namespace ApplicationCore.Entity
         {
             ChangeState(ReviewRequestState.Rejected);
         }
-
-
+        
+        public void Waiting()
+        {
+            ChangeState(ReviewRequestState.Waiting);
+        }
     }
 }

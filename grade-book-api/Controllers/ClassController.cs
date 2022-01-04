@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using ApplicationCore.Entity;
@@ -302,9 +303,18 @@ namespace grade_book_api.Controllers
         }
         // change review state 
         [HttpPut("{classId}/review/{reviewId}")]
-        public IActionResult ChangeGradeReviewState(int classId, int reviewId)
+        public IActionResult ChangeGradeReviewState(int classId, int reviewId, UpdateGradeReviewStateRequest request)
         {
-            return Ok("Doing");
+            if (GetCurrentUserRole(classId) != ClassRole.Teacher)
+                return Unauthorized("Only teacher is allowed to update state of a review request");
+            var allowedState = new string[] {"waiting", "accepted", "rejected"};
+            if (allowedState.Contains(request.State))
+            {
+                _reviewService.UpdateGradeReviewState(reviewId, request.State);
+                return Ok("Updated");
+            }
+
+            return BadRequest("Allowed new states are: waiting, accepted, rejected"); 
         }
 
         [HttpPost("{classId}/review/{reviewId}")]

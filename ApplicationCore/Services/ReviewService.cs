@@ -79,16 +79,16 @@ namespace ApplicationCore.Services
             return reviews.ToList(); 
         }
 
-        public GradeReviewReply AddReviewReplyAsTeacher(int userId, int requestId, string content)
+        public GradeReviewReply AddReviewReplyAsTeacher(int userId, int reviewId, string content)
         {
             
             var foundUser = _userRepository.GetFirst(user => user.Id == userId);
-            var foundRequest = _reviewRepository.GetFirst(r => r.Id == requestId);
+            var foundRequest = _reviewRepository.GetFirst(r => r.Id == reviewId);
 
             var newReply = new GradeReviewReply()
             {
                 Content = content,
-                AssignmentGradeReviewRequestId = requestId,
+                AssignmentGradeReviewRequestId = reviewId,
                 AssignmentGradeReviewRequest = foundRequest,
                 Replier = foundUser,
                 ReplierId = userId,
@@ -98,10 +98,10 @@ namespace ApplicationCore.Services
             return _replyRepository.Insert(newReply);
         }
 
-        public GradeReviewReply AddReviewReplyAsStudent(int userId, int requestId, string content)
+        public GradeReviewReply AddReviewReplyAsStudent(int userId, int reviewId, string content)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == userId);
-            var foundRequest = _reviewRepository.GetFirst(r => r.Id == requestId, 
+            var foundRequest = _reviewRepository.GetFirst(r => r.Id == reviewId, 
                 r => r.Include(req => req.StudentAssignmentGrade)
                     .ThenInclude(sGrade => sGrade.StudentRecord));
 
@@ -111,7 +111,7 @@ namespace ApplicationCore.Services
             var newReply = new GradeReviewReply()
             {
                 Content = content,
-                AssignmentGradeReviewRequestId = requestId,
+                AssignmentGradeReviewRequestId = reviewId,
                 AssignmentGradeReviewRequest = foundRequest,
                 Replier = foundUser,
                 ReplierId = userId,
@@ -120,6 +120,32 @@ namespace ApplicationCore.Services
 
             return _replyRepository.Insert(newReply);
 
+
+        }
+
+        public void UpdateGradeReviewState(int reviewId, string newState)
+        {
+            var foundRequest = _reviewRepository.GetFirst(r => r.Id == reviewId,
+                r => r.Include(request => request.StudentAssignmentGrade));
+            switch (newState)
+            {
+                case "accepted": {
+                    foundRequest.Accept();
+                    break;
+                }
+                case "rejected":
+                {
+                    foundRequest.Reject();
+                    break;
+                }
+                case "waiting":
+                {
+                    foundRequest.Waiting();
+                    break;
+                }
+            }
+
+            _reviewRepository.Update(foundRequest);
 
         }
     }
