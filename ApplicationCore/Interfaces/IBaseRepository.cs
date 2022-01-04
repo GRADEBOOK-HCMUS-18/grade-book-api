@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using ApplicationCore.Entity;
+using Ardalis.Specification;
 using Microsoft.EntityFrameworkCore.Query;
 
 namespace ApplicationCore.Interfaces
@@ -14,6 +15,8 @@ namespace ApplicationCore.Interfaces
         TEntity GetFirst(Expression<Func<TEntity, bool>> predicate,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 
+        TEntity GetFirst(ISpecification<TEntity> specification); 
+
         void Delete(TEntity entity);
 
         TEntity Insert(TEntity entity);
@@ -22,9 +25,8 @@ namespace ApplicationCore.Interfaces
 
         IEnumerable<TEntity> ListAll();
 
-        IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "");
+        IEnumerable<TEntity> List(ISpecification<TEntity> specification);
+
 
         IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Ardalis.Specification" Version="5.2.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.12" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.1.2" />

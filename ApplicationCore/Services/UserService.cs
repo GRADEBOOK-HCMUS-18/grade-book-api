@@ -60,6 +60,8 @@ namespace ApplicationCore.Services
             var foundUser = _userRepository.GetFirst(user => user.Id == userId,
                 user => user.Include(u => u.ClassStudentsAccounts)
                     .Include(u => u.ClassTeachersAccounts));
+            if (foundUser is null)
+                return ClassRole.NotAMember;
 
             if (foundClass.MainTeacher == foundUser) return ClassRole.Teacher;
 

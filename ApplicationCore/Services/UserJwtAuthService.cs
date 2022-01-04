@@ -54,19 +54,7 @@ namespace ApplicationCore.Services
             var foundUser = _repository.GetFirst(user => user.Email == email);
 
             if (foundUser is not null) throw new ApplicationException("Existed user");
-            var userToAdd = new User();
-            userToAdd.Email = email;
-            userToAdd.FirstName = firstName;
-            userToAdd.LastName = lastName;
-            userToAdd.ProfilePictureUrl = profilePictureUrl;
-            userToAdd.DefaultProfilePictureHex = defaultProfilePictureHex;
-
-            userToAdd.IsPasswordNotSet = string.IsNullOrEmpty(password);
-            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
-            userToAdd.PasswordSalt = newPasswordSalt;
-            userToAdd.PasswordHash = newPasswordHash;
-
-
+            var userToAdd = new User(email, firstName, lastName, password, profilePictureUrl, defaultProfilePictureHex);
             _repository.Insert(userToAdd);
 
             return userToAdd;

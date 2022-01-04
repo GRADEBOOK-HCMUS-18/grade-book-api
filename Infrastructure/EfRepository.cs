@@ -4,6 +4,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
+using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -32,6 +34,13 @@ namespace Infrastructure
 
             return queryable.FirstOrDefault(predicate);
         }
+
+        public TEntity GetFirst(ISpecification<TEntity> specification)
+        {
+            var specificationResult = ApplySpecification(specification);
+            return specificationResult.FirstOrDefault();
+        }
+
 
         public void Delete(TEntity entity)
         {
@@ -64,23 +73,12 @@ namespace Infrastructure
             return _dbSet.Set<TEntity>();
         }
 
-        public IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "")
-
+        public IEnumerable<TEntity> List(ISpecification<TEntity> specification)
         {
-            IQueryable<TEntity> query = _dbSet.Set<TEntity>();
-            if (filter is not null) query = query.Where(filter);
-
-            var includes = includeProperties.Split(',', '|');
-            if (!string.IsNullOrEmpty(includeProperties))
-                query = includes
-                    .Aggregate(query, (current, property) => current.Include(property));
-
-            if (orderBy is not null) query = orderBy(query);
-
-            return query.ToList();
+            var specificationResult = ApplySpecification(specification);
+            return specificationResult.ToList();
         }
+
 
         public IEnumerable<TEntity> List(Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
@@ -93,6 +91,11 @@ namespace Infrastructure
             if (orderBy is not null) query = orderBy(query);
 
             return query.ToList();
+        }  
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
+        {
+            var evaluator = new SpecificationEvaluator();
+            return evaluator.GetQuery(_dbSet.Set<TEntity>().AsQueryable(), spec);
         }
     }
 }

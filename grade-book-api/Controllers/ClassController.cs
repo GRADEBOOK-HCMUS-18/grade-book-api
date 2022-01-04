@@ -303,6 +303,40 @@ namespace grade_book_api.Controllers
         
         }
 
+        [HttpPost("{classId}/review/{reviewId}")]
+        public IActionResult AddGradeRequestReply(int classId, int reviewId)
+        {
+            var currentUserRole = GetCurrentUserRole(classId);
+            var currentUserId = GetCurrentUserIdFromToken();
+
+            if (currentUserRole is ClassRole.Teacher)
+            {
+                var result = _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, "xxx");
+                return Ok(new ReviewReplyResponse(result));
+            }
+
+            if (currentUserRole is ClassRole.Student)
+            {
+                try
+                {
+                    var result = _reviewService.AddReviewReplyAsStudent(currentUserId, reviewId, "xxx");
+                    return Ok(new ReviewReplyResponse(result));
+                }
+                catch (ApplicationException ex)
+                {
+                    return Unauthorized(ex.Message);
+                }
+
+            }
+            return Unauthorized();
+        }
+        // change review state 
+        [HttpPut("{classId}/review/{reviewId}")]
+        public IActionResult ChangeGradeReviewState(int classId, int reviewId)
+        {
+            return Ok("Doing");
+        }
+
 
         private int GetCurrentUserIdFromToken()
         {

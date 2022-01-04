@@ -50,7 +50,7 @@ namespace ApplicationCore.Services
                 throw new ApplicationException("User does not exists");
 
             var mainTeacherClasses =
-                _classRepository.List(cl => cl.MainTeacher == foundUser, null, "MainTeacher");
+                _classRepository.List(cl => cl.MainTeacher == foundUser, null, cl => cl.Include(c => c.MainTeacher));
             return mainTeacherClasses.ToList();
         }
 

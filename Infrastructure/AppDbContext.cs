@@ -35,6 +35,7 @@ namespace Infrastructure
             SetupStudentGradeAndReviewRequestRelationship(modelBuilder);
             SetupUserAndNotificationRelationship(modelBuilder);
             SetupAssignmentGradeReviewAndReplyRelationship(modelBuilder);
+            SetupUserAndGradeReviewReplyRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
         }
@@ -77,6 +78,14 @@ namespace Infrastructure
                 .HasOne(reply => reply.AssignmentGradeReviewRequest)
                 .WithMany(r => r.GradeReviewReplies)
                 .HasForeignKey(reply => reply.AssignmentGradeReviewRequestId);
+        }
+
+        private static void SetupUserAndGradeReviewReplyRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GradeReviewReply>()
+                .HasOne(reply => reply.Replier)
+                .WithMany(u => u.GradeReviewReplies)
+                .HasForeignKey(reply => reply.ReplierId);
         }
         
 

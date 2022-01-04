@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SharedKernel;
 
 namespace ApplicationCore.Entity
 {
@@ -22,9 +23,27 @@ namespace ApplicationCore.Entity
 
         public IList<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
+        public IList<GradeReviewReply> GradeReviewReplies { get; set; } = new List<GradeReviewReply>();
+
         public void SetLockAccount(bool newState)
         {
             IsLocked = newState;
         }
+
+        public User(string email, string firstName, string lastName, string password, string profilePictureUrl,
+            string defaultProfilePictureHex)
+        {
+            Email = email;
+            FirstName = firstName;
+            LastName = lastName;
+            IsPasswordNotSet = string.IsNullOrEmpty(password);
+            ProfilePictureUrl = profilePictureUrl;
+            DefaultProfilePictureHex = defaultProfilePictureHex;
+            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
+            PasswordSalt = newPasswordSalt;
+            PasswordHash = newPasswordHash;
+        }
+        
+        public User(){}
     }
 }
