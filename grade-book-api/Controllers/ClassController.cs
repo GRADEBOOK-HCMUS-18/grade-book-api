@@ -299,19 +299,24 @@ namespace grade_book_api.Controllers
             {
                 return Unauthorized(ex.Message);
             }
-
-        
+        }
+        // change review state 
+        [HttpPut("{classId}/review/{reviewId}")]
+        public IActionResult ChangeGradeReviewState(int classId, int reviewId)
+        {
+            return Ok("Doing");
         }
 
         [HttpPost("{classId}/review/{reviewId}")]
-        public IActionResult AddGradeRequestReply(int classId, int reviewId)
+        public IActionResult AddGradeRequestReply(int classId, int reviewId, AddGradeRequestReplyRequest request)
         {
             var currentUserRole = GetCurrentUserRole(classId);
             var currentUserId = GetCurrentUserIdFromToken();
 
             if (currentUserRole is ClassRole.Teacher)
             {
-                var result = _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, "xxx");
+                var result =
+                    _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, request.Content);
                 return Ok(new ReviewReplyResponse(result));
             }
 
@@ -319,7 +324,8 @@ namespace grade_book_api.Controllers
             {
                 try
                 {
-                    var result = _reviewService.AddReviewReplyAsStudent(currentUserId, reviewId, "xxx");
+                    var result = 
+                        _reviewService.AddReviewReplyAsStudent(currentUserId, reviewId, request.Content);
                     return Ok(new ReviewReplyResponse(result));
                 }
                 catch (ApplicationException ex)
@@ -329,12 +335,6 @@ namespace grade_book_api.Controllers
 
             }
             return Unauthorized();
-        }
-        // change review state 
-        [HttpPut("{classId}/review/{reviewId}")]
-        public IActionResult ChangeGradeReviewState(int classId, int reviewId)
-        {
-            return Ok("Doing");
         }
 
 

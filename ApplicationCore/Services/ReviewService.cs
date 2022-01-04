@@ -101,7 +101,9 @@ namespace ApplicationCore.Services
         public GradeReviewReply AddReviewReplyAsStudent(int userId, int requestId, string content)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == userId);
-            var foundRequest = _reviewRepository.GetFirst(r => r.Id == requestId);
+            var foundRequest = _reviewRepository.GetFirst(r => r.Id == requestId, 
+                r => r.Include(req => req.StudentAssignmentGrade)
+                    .ThenInclude(sGrade => sGrade.StudentRecord));
 
             if (foundUser.StudentIdentification !=
                 foundRequest.StudentAssignmentGrade.StudentRecord.StudentIdentification)

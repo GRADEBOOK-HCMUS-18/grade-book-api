@@ -12,6 +12,7 @@ namespace ApplicationCore.Specifications
                 .Where(sGrade => sGrade.Assignment.Class.Id == classId)
                 .Include(sGrade => sGrade.AssignmentGradeReviewRequests)
                 .ThenInclude(r => r.GradeReviewReplies)
+                .ThenInclude(reply => reply.Replier)
                 .Include(sGrade => sGrade.StudentRecord)
                 .Include(sGrade => sGrade.Assignment)
                 .ThenInclude(sGrade => sGrade.Class);
