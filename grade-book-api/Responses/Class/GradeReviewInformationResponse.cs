@@ -11,6 +11,8 @@ namespace grade_book_api.Responses.Class
         public int RequestedNewPoint { get; set; }
         public string Description { get; set; }
         public string State { get; set; }
+        
+        public AssignmentInformationResponse Assignment { get; set; }
         public AssignmentGradeResponse CurrentGrade { get; set; }
         public StudentRecordResponse Student { get; set; }
         
@@ -30,6 +32,7 @@ namespace grade_book_api.Responses.Class
                 ReviewRequestState.Rejected => "Rejected",
                 _ => "Waiting"
             };
+            Assignment = new AssignmentInformationResponse(sourceRequest.StudentAssignmentGrade.Assignment);
             CurrentGrade = new AssignmentGradeResponse(sourceRequest.StudentAssignmentGrade);
             Student = new StudentRecordResponse(sourceRequest.StudentAssignmentGrade.StudentRecord);
             Replies = sourceRequest.GradeReviewReplies.Select(reply => new ReviewReplyResponse(reply)).ToList();
