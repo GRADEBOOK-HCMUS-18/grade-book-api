@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace ApplicationCore.Entity
@@ -17,6 +18,7 @@ namespace ApplicationCore.Entity
         public string Description { get; set; }
 
         public ReviewRequestState RequestState { get; set; } = ReviewRequestState.Waiting;
+        public DateTime DateCreated { get; set; } 
 
         public List<GradeReviewReply> GradeReviewReplies { get; set; } = new List<GradeReviewReply>();
 

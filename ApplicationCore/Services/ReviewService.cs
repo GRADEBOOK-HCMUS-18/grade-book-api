@@ -52,7 +52,8 @@ namespace ApplicationCore.Services
                 StudentAssignmentGradeId = foundSGrade.Id,
                 StudentAssignmentGrade = foundSGrade,
                 RequestState = ReviewRequestState.Waiting,
-                RequestedNewPoint = requestedPoint
+                RequestedNewPoint = requestedPoint,
+                DateCreated = DateTime.Now
             };
 
 
