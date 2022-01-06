@@ -20,7 +20,7 @@ namespace ApplicationCore.Entity
         public ReviewRequestState RequestState { get; set; } = ReviewRequestState.Waiting;
         public DateTime DateCreated { get; set; } 
 
-        public List<GradeReviewReply> GradeReviewReplies { get; set; } = new List<GradeReviewReply>();
+        public List<GradeReviewReply> GradeReviewReplies { get; set; } = new();
 
         private void ChangeState(ReviewRequestState newState)
         {

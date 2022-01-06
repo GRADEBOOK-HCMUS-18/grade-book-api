@@ -19,6 +19,7 @@ namespace ApplicationCore.Entity
         public IList<StudentRecord> Students { get; set; } = new List<StudentRecord>();
 
         public IList<Assignment> ClassAssignments { get; set; } = new List<Assignment>();
+        public IList<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
 
         public StudentRecord FindStudent(string studentId)

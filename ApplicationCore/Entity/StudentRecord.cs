@@ -10,6 +10,6 @@ namespace ApplicationCore.Entity
         public string StudentIdentification { get; set; }
         public string FullName { get; set; }
 
-        public IList<StudentAssignmentGrade> Grades { get; set; }
+        public IList<StudentAssignmentGrade> Grades { get; set; } = new List<StudentAssignmentGrade>();
     }
 }

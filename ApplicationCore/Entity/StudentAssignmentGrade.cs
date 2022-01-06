@@ -11,7 +11,7 @@ namespace ApplicationCore.Entity
         public int Point { get; set; }
 
         public bool IsFinalized { get; set; }
-        
-        public List<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; }
+
+        public List<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; } = new();
     }
 }

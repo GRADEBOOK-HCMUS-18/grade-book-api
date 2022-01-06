@@ -185,7 +185,7 @@ namespace grade_book_api.Controllers
         public IActionResult UpdateAssignmentFinalization(int classId, int assignmentId,
             UpdateAssignmentFinalizationRequest request)
         {
-            if (GetCurrentUserRole(classId) is ClassRole.Teacher)
+            if (GetCurrentUserRole(classId) is not ClassRole.Teacher)
                 return Unauthorized("User not a teacher in class");
             _ = _assignmentService.UpdateAssignmentFinalization(assignmentId, request.NewStatus);
             return Ok();
@@ -305,7 +305,7 @@ namespace grade_book_api.Controllers
         [HttpPut("{classId}/review/{reviewId}")]
         public IActionResult ChangeGradeReviewState(int classId, int reviewId, UpdateGradeReviewStateRequest request)
         {
-            if (GetCurrentUserRole(classId) != ClassRole.Teacher)
+            if (GetCurrentUserRole(classId) is not ClassRole.Teacher)
                 return Unauthorized("Only teacher is allowed to update state of a review request");
             var allowedState = new string[] {"waiting", "accepted", "rejected"};
             if (allowedState.Contains(request.State))

@@ -12,7 +12,7 @@ namespace ApplicationCore.Entity
         public int Priority { get; set; }
         public Class Class { get; set; }
 
-        public IList<StudentAssignmentGrade> StudentAssignmentGrades { get; set; }
+        public IList<StudentAssignmentGrade> StudentAssignmentGrades { get; set; } = new List<StudentAssignmentGrade>();
 
         public void SetStudentAssignmentGrades(List<StudentAssignmentGrade> source)
         {
