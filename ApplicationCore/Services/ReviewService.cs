@@ -40,9 +40,7 @@ namespace ApplicationCore.Services
                 throw new ApplicationException("Only student with student Id is allowed");
             }
             var foundSGrade = _sGradeRepository.GetFirst(
-                sg => sg.StudentRecord.StudentIdentification == foundUser.StudentIdentification &&
-                      sg.AssignmentId == assignmentId,
-                sg => sg.Include(sGrade => sGrade.StudentRecord));
+                new StudentGradeWithAssignmentAndStudentSpec(assignmentId,foundUser.StudentIdentification));
 
             if (foundSGrade is null)
                 return null;
