@@ -19,10 +19,12 @@ namespace ApplicationCore.Entity
         
         public NotificationType NotificationType { get; set; }
         public int? AssignmentId { get; set; }
-        public int? ReviewId { get; set; }
-
-        public string Content { get; set; }
+        public Assignment Assignment { get; set; }
         
+        public AssignmentGradeReviewRequest AssignmentGradeReviewRequest { get; set; }
+
         public DateTime DateTime { get; set; }
+        
+        public bool IsViewed { get; set; }
     }
 }

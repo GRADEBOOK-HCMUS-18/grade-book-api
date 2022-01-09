@@ -35,6 +35,8 @@ namespace Infrastructure
             SetupStudentGradeAndReviewRequestRelationship(modelBuilder);
             SetupUserAndNotificationRelationship(modelBuilder);
             SetupNotificationAndClassRelationship(modelBuilder);
+            SetupNotificationAndAssignmentRelationship(modelBuilder);
+            SetupNotificationAndReviewRequestRelationship(modelBuilder);
             SetupAssignmentGradeReviewAndReplyRelationship(modelBuilder);
             SetupUserAndGradeReviewReplyRelationship(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
@@ -80,6 +82,18 @@ namespace Infrastructure
                 .WithMany(c => c.UserNotifications)
                 .HasForeignKey(n => n.ClassId);
         }
+        private static void SetupNotificationAndAssignmentRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserNotification>()
+                .HasOne(n => n.Assignment)
+                .WithMany(a => a.UserNotifications)
+                .HasForeignKey(n => n.AssignmentId);
+        }   
+        private static void SetupNotificationAndReviewRequestRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserNotification>()
+                .HasOne(n => n.AssignmentGradeReviewRequest);
+        }   
 
         private static void SetupAssignmentGradeReviewAndReplyRelationship(ModelBuilder modelBuilder)
         {

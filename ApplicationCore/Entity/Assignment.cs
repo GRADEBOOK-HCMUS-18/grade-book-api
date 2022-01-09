@@ -14,6 +14,8 @@ namespace ApplicationCore.Entity
 
         public IList<StudentAssignmentGrade> StudentAssignmentGrades { get; set; } = new List<StudentAssignmentGrade>();
 
+        public IList<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
+
         public void SetStudentAssignmentGrades(List<StudentAssignmentGrade> source)
         {
             StudentAssignmentGrades = source;
