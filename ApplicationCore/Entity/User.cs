@@ -30,6 +30,14 @@ namespace ApplicationCore.Entity
             IsLocked = newState;
         }
 
+        public void SetAllNotificationRead(bool newState)
+        {
+            foreach (var notification in UserNotifications)
+            {
+                notification.IsViewed = newState;
+            }
+        }
+
         public User(string email, string firstName, string lastName, string password, string profilePictureUrl,
             string defaultProfilePictureHex)
         {

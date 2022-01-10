@@ -21,10 +21,14 @@ namespace grade_book_api.Controllers
         [HttpGet]
         public IActionResult GetPagedNotification([FromQuery] int notificationPerPage, [FromQuery] int pageNumber)
         {
+            int userId = GetCurrentUserIdFromToken();
             var listNotifications = _notificationService
-                .ReadPagedUserNotification(GetCurrentUserIdFromToken(), pageNumber, notificationPerPage);
+                .ReadPagedUserNotification(userId, pageNumber, notificationPerPage);
+            var response = new NotificationListResponse(pageNumber,listNotifications);
+            
+            _notificationService.SetUserNotificationAsViewed(userId);
 
-            return Ok(new NotificationListResponse(pageNumber,listNotifications));
+            return Ok(response);
         }
         private int GetCurrentUserIdFromToken()
         {

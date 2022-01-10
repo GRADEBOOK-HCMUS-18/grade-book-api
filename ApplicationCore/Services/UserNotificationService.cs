@@ -12,12 +12,14 @@ namespace ApplicationCore.Services
     {
         private readonly IBaseRepository<Assignment> _assignmentRepository;
         private readonly IBaseRepository<UserNotification> _notificationRepository;
+        private readonly IBaseRepository<User> _userRepository;
 
 
-        public UserNotificationService(IBaseRepository<Assignment> assignmentRepository, IBaseRepository<UserNotification> notificationRepository)
+        public UserNotificationService(IBaseRepository<Assignment> assignmentRepository, IBaseRepository<UserNotification> notificationRepository, IBaseRepository<User> userRepository)
         {
             _assignmentRepository = assignmentRepository;
             _notificationRepository = notificationRepository;
+            _userRepository = userRepository;
         }
         public List<UserNotification> ReadPagedUserNotification(int userId,int pageNumber, int numOfNotificationPerPage)
         {
@@ -26,6 +28,16 @@ namespace ApplicationCore.Services
 
             return listNotification.ToList();
 
+        }
+
+        public void SetUserNotificationAsViewed(int userId)
+        {
+            var foundUser =
+                _userRepository
+                    .GetFirst(u => u.Id == userId,
+                        u => u.Include(user => user.UserNotifications)); 
+            foundUser.SetAllNotificationRead(true);
+            _userRepository.Update(foundUser);
         }
 
         public void AddNewFinalizedGradeCompositionNotification(int assignmentId)

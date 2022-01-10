@@ -8,6 +8,8 @@ namespace ApplicationCore.Interfaces
     {
         List<UserNotification> ReadPagedUserNotification(int userId,int pageNumber, int numOfNotificationPerPage);
 
+        void SetUserNotificationAsViewed(int userId);
+
         void AddNewFinalizedGradeCompositionNotification(int assignmentId);
 
         UserNotification AddNewGradeRequestNotification(AssignmentGradeReviewRequest request);
