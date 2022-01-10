@@ -23,8 +23,8 @@ namespace ApplicationCore.Entity
         
         public AssignmentGradeReviewRequest AssignmentGradeReviewRequest { get; set; }
 
-        public DateTime DateTime { get; set; }
-        
-        public bool IsViewed { get; set; }
+        public DateTime DateTime { get; set; } = DateTime.Now;
+
+        public bool IsViewed { get; set; } = false;
     }
 }

@@ -21,6 +21,8 @@ namespace ApplicationCore.Interfaces
 
         TEntity Insert(TEntity entity);
 
+        void InsertRange(List<TEntity> entities);
+
         TEntity Update(TEntity entity);
 
         IEnumerable<TEntity> ListAll();

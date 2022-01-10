@@ -8,7 +8,7 @@ using SharedKernel;
 
 namespace ApplicationCore.Services
 {
-    public class UserService : IUserServices //TODO: refractor user services 
+    public class UserService : IUserServices 
     {
         private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;

@@ -58,6 +58,14 @@ namespace grade_book_api
             });
             services.AddAuthorization();
 
+            // set up DI services
+            ConfigureIocContainer(services);
+
+
+        }
+
+        private void ConfigureIocContainer(IServiceCollection services)
+        {
             // set up cloudinary
             var cloud = Configuration.GetValue<string>("AccountSettings:CloudName");
             var apiKey = Configuration.GetValue<string>("AccountSettings:ApiKey");
@@ -65,9 +73,6 @@ namespace grade_book_api
             var cloudinaryAccount = new Account(cloud, apiKey, apiSecret);
 
             var cloudinary = new Cloudinary(cloudinaryAccount);
-            // set up DI services
-
-
             services.AddScoped<IUserJwtAuthService, UserJwtAuthService>();
             services.AddScoped<IUserServices, UserService>();
             services.AddScoped<IClassService, ClassService>();
@@ -79,6 +84,8 @@ namespace grade_book_api
             services.AddScoped<IEmailSender, MailKitEmailSenderAdapter>();
             services.AddSingleton(Configuration);
             services.AddSingleton(cloudinary);
+            services.AddScoped<IUserNotificationService, UserNotificationService>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

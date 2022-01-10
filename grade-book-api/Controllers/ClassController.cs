@@ -20,17 +20,19 @@ namespace grade_book_api.Controllers
         private readonly IUserServices _userServices;
         private readonly IAssignmentService _assignmentService;
         private readonly IReviewService _reviewService;
+        private readonly IUserNotificationService _notificationService;
 
         public ClassController(
             IClassService classService,
             IUserServices userServices,
             IAssignmentService assignmentService,
-            IReviewService reviewService)
+            IReviewService reviewService, IUserNotificationService notificationService)
         {
             _classService = classService;
             _userServices = userServices;
             _assignmentService = assignmentService;
             _reviewService = reviewService;
+            _notificationService = notificationService;
         }
 
         [HttpGet]
@@ -188,6 +190,11 @@ namespace grade_book_api.Controllers
             if (GetCurrentUserRole(classId) is not ClassRole.Teacher)
                 return Unauthorized("User not a teacher in class");
             _ = _assignmentService.UpdateAssignmentFinalization(assignmentId, request.NewStatus);
+            if (request.NewStatus)
+            {
+                _notificationService.AddNewFinalizedGradeCompositionNotification(assignmentId);
+            }
+            // TODO: insert new finalization notification 
             return Ok();
         }
 
@@ -198,6 +205,7 @@ namespace grade_book_api.Controllers
             if (GetCurrentUserRole(classId) is not ClassRole.Teacher)
                 return Unauthorized("User not a teacher in class");
             _ = _assignmentService.UpdateWholeClassAssignmentFinalization(classId, request.NewStatus);
+            // TODO: insert new finalization notification 
             return Ok();
         }
 
@@ -311,6 +319,7 @@ namespace grade_book_api.Controllers
             if (allowedState.Contains(request.State))
             {
                 _reviewService.UpdateGradeReviewState(reviewId, request.State);
+                // TODO: Insert new change review state notification
                 return Ok("Updated");
             }
 
@@ -327,6 +336,7 @@ namespace grade_book_api.Controllers
             {
                 var result =
                     _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, request.Content);
+                // TODO: insert new grade request reply notification 
                 return Ok(new ReviewReplyResponse(result));
             }
 

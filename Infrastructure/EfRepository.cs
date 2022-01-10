@@ -58,6 +58,12 @@ namespace Infrastructure
             return entity;
         }
 
+        public void InsertRange(List<TEntity> entities)
+        {
+            _dbSet.AddRange(entities);
+            _dbSet.SaveChanges();
+        }
+
         public TEntity Update(TEntity entity)
         {
             _dbSet.Set<TEntity>().Attach(entity);
