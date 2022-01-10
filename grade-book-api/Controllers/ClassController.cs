@@ -194,7 +194,6 @@ namespace grade_book_api.Controllers
             {
                 _notificationService.AddNewFinalizedGradeCompositionNotification(assignmentId);
             }
-            // TODO: insert new finalization notification 
             return Ok();
         }
 

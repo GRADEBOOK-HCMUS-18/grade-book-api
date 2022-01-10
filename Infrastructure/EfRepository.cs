@@ -97,7 +97,16 @@ namespace Infrastructure
             if (orderBy is not null) query = orderBy(query);
 
             return query.ToList();
-        }  
+        }
+
+        public int Count(Expression<Func<TEntity, bool>> filter = null)
+        {
+            IQueryable<TEntity> query = _dbSet.Set<TEntity>();
+            if (filter is not null)
+                query = query.Where(filter);
+
+            return query.Count();
+        }
         private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
         {
             var evaluator = new SpecificationEvaluator();

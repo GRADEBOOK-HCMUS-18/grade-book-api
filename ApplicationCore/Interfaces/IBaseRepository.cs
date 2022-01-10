@@ -15,8 +15,8 @@ namespace ApplicationCore.Interfaces
         TEntity GetFirst(Expression<Func<TEntity, bool>> predicate,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null);
 
-        TEntity GetFirst(ISpecification<TEntity> specification); 
-
+        TEntity GetFirst(ISpecification<TEntity> specification);
+        int Count(Expression<Func<TEntity, bool>> filter = null);
         void Delete(TEntity entity);
 
         TEntity Insert(TEntity entity);

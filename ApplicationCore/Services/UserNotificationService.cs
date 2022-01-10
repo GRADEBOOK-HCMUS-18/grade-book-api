@@ -40,6 +40,11 @@ namespace ApplicationCore.Services
             _userRepository.Update(foundUser);
         }
 
+        public int CountNotViewedNotification(int userId)
+        {
+            return _notificationRepository.Count(n => !n.IsViewed && n.UserId == userId);
+        }
+
         public void AddNewFinalizedGradeCompositionNotification(int assignmentId)
         {
             var foundAssignment = _assignmentRepository.GetFirst(a => a.Id == assignmentId,

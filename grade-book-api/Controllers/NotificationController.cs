@@ -24,7 +24,9 @@ namespace grade_book_api.Controllers
             int userId = GetCurrentUserIdFromToken();
             var listNotifications = _notificationService
                 .ReadPagedUserNotification(userId, pageNumber, notificationPerPage);
-            var response = new NotificationListResponse(pageNumber,listNotifications);
+
+            int numberOfNotViewedNotification = _notificationService.CountNotViewedNotification(userId);
+            var response = new NotificationListResponse(pageNumber,listNotifications,numberOfNotViewedNotification);
             
             _notificationService.SetUserNotificationAsViewed(userId);
 

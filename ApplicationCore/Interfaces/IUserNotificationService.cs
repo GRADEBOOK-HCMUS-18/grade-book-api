@@ -10,6 +10,8 @@ namespace ApplicationCore.Interfaces
 
         void SetUserNotificationAsViewed(int userId);
 
+        int CountNotViewedNotification(int userId);
+
         void AddNewFinalizedGradeCompositionNotification(int assignmentId);
 
         UserNotification AddNewGradeRequestNotification(AssignmentGradeReviewRequest request);
