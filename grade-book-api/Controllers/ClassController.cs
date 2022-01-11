@@ -319,7 +319,7 @@ namespace grade_book_api.Controllers
             if (allowedState.Contains(request.State))
             {
                 _reviewService.UpdateGradeReviewState(reviewId, request.State);
-                // TODO: Insert new change review state notification
+                _notificationService.AddAcceptedOrRejectedGradeReviewNotification(reviewId);
                 return Ok("Updated");
             }
 
@@ -336,7 +336,7 @@ namespace grade_book_api.Controllers
             {
                 var result =
                     _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, request.Content);
-                // TODO: insert new grade request reply notification 
+                _notificationService.AddNewGradeReviewReplyNotification(result.Id);
                 return Ok(new ReviewReplyResponse(result));
                 
             }
@@ -347,6 +347,7 @@ namespace grade_book_api.Controllers
                 {
                     var result = 
                         _reviewService.AddReviewReplyAsStudent(currentUserId, reviewId, request.Content);
+                    _notificationService.AddNewGradeReviewReplyNotification(result.Id);
                     return Ok(new ReviewReplyResponse(result));
                 }
                 catch (ApplicationException ex)
@@ -373,7 +374,7 @@ namespace grade_book_api.Controllers
         private string GetCurrentUserStudentId()
         {
             var userId = GetCurrentUserIdFromToken();
-            string currentStudentIdentification = _userServices.GetUserById(userId).StudentIdentification;
+            var currentStudentIdentification = _userServices.GetUserById(userId).StudentIdentification;
             return currentStudentIdentification;
         }
     }

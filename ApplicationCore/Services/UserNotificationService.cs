@@ -15,17 +15,20 @@ namespace ApplicationCore.Services
         private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<AssignmentGradeReviewRequest> _reviewRepository;
         private readonly IBaseRepository<Class> _classRepository;
+        private readonly IBaseRepository<GradeReviewReply> _replyRepository;
 
 
         public UserNotificationService(IBaseRepository<Assignment> assignmentRepository,
             IBaseRepository<UserNotification> notificationRepository, IBaseRepository<User> userRepository,
-            IBaseRepository<AssignmentGradeReviewRequest> reviewRepository, IBaseRepository<Class> classRepository)
+            IBaseRepository<AssignmentGradeReviewRequest> reviewRepository, IBaseRepository<Class> classRepository,
+            IBaseRepository<GradeReviewReply> replyRepository)
         {
             _assignmentRepository = assignmentRepository;
             _notificationRepository = notificationRepository;
             _userRepository = userRepository;
             _reviewRepository = reviewRepository;
             _classRepository = classRepository;
+            _replyRepository = replyRepository;
         }
 
         public List<UserNotification> ReadPagedUserNotification(int userId, int pageNumber,
@@ -119,12 +122,81 @@ namespace ApplicationCore.Services
 
         public void AddNewGradeReviewReplyNotification(int replyId)
         {
-            throw new NotImplementedException();
+            var foundReply = _replyRepository.GetFirst(reply => reply.Id == replyId,
+                reply => reply
+                    .Include(r => r.AssignmentGradeReviewRequest)
+                    .ThenInclude(request => request.StudentAssignmentGrade)
+                    .ThenInclude(sGrade => sGrade.Assignment)
+                    .ThenInclude(a => a.Class)
+                    .Include(r => r.AssignmentGradeReviewRequest)
+                    .ThenInclude(request => request.StudentAssignmentGrade)
+                    .ThenInclude(sGrade => sGrade.StudentRecord));
+            var foundStudentRecord = foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.StudentRecord;
+            var foundStudent =
+                _userRepository.GetFirst(u => u.StudentIdentification == foundStudentRecord.StudentIdentification);
+
+
+            var classOfRequest =
+                _classRepository.GetFirst(
+                    c => c.Id == foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.Assignment.Class.Id,
+                    c => c.Include(cl => cl.MainTeacher)
+                        .Include(cl => cl.ClassTeachersAccounts)
+                        .ThenInclude(ct => ct.Teacher));
+
+            var teachersList = classOfRequest.GetAllTeacher();
+
+            var userReceive = teachersList;
+
+
+            if (foundStudent is not null)
+                userReceive.Add(foundStudent);
+            // issuer does not receive a notification
+            userReceive = userReceive.Where(u => u.Id != foundReply.ReplierId).ToList();
+
+
+            var newNotifications = userReceive.Select(user => new UserNotification
+            {
+                NotificationType = NotificationType.NewGradeReviewReply,
+                Assignment = foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.Assignment,
+                AssignmentId = foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.AssignmentId,
+                Class = foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.Assignment.Class,
+                ClassId = foundReply.AssignmentGradeReviewRequest.StudentAssignmentGrade.Assignment.Class.Id,
+                AssignmentGradeReviewRequest = foundReply.AssignmentGradeReviewRequest,
+                User = user,
+                UserId = user.Id
+            }).ToList();
+
+            _notificationRepository.InsertRange(newNotifications);
         }
 
         public void AddAcceptedOrRejectedGradeReviewNotification(int requestId)
         {
-            throw new NotImplementedException();
+            var foundRequest = _reviewRepository.GetFirst(r => r.Id == requestId,
+                r =>
+                    r.Include(re => re.StudentAssignmentGrade)
+                        .ThenInclude(sGrade => sGrade.Assignment)
+                        .ThenInclude(a => a.Class)
+                        .Include(re => re.StudentAssignmentGrade)
+                        .ThenInclude(sGrade => sGrade.StudentRecord)
+            );
+
+            string studentIdentification = foundRequest.StudentAssignmentGrade.StudentRecord.StudentIdentification;
+            var foundStudent = _userRepository.GetFirst(u => u.StudentIdentification == studentIdentification);
+            if (foundStudent is null)
+                return;
+            var newNotification = new UserNotification
+            {
+                NotificationType = NotificationType.AcceptedOrRejectedGradeReview,
+                Assignment = foundRequest.StudentAssignmentGrade.Assignment,
+                AssignmentId = foundRequest.StudentAssignmentGrade.Assignment.Id,
+                Class = foundRequest.StudentAssignmentGrade.Assignment.Class,
+                ClassId = foundRequest.StudentAssignmentGrade.Assignment.Class.Id,
+                AssignmentGradeReviewRequest = foundRequest,
+                User = foundStudent,
+                UserId = foundStudent.Id
+            };
+
+            _notificationRepository.Insert(newNotification);
         }
     }
 }
