@@ -11,5 +11,7 @@ namespace ApplicationCore.Interfaces
 
         User CreateNewUser(string password, string email, string firstName, string lastName,
             string profilePictureUrl, string defaultProfilePictureHex);
+
+        AccountConfirmationRequest CreateNewConfirmationRequest(string email);
     }
 }

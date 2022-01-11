@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests;
 using grade_book_api.Responses.Authentication;
@@ -13,12 +14,14 @@ namespace grade_book_api.Controllers
     {
         private readonly IUserJwtAuthService _authService;
         private readonly IUserServices _userService;
+        private readonly IEmailSender _emailSender;
 
         public AuthenticationController(
              IUserJwtAuthService authService
-            , IUserServices userService)
+            , IUserServices userService, IEmailSender emailSender)
         {
             _userService = userService;
+            _emailSender = emailSender;
             _authService = authService;
         }
 
@@ -86,6 +89,34 @@ namespace grade_book_api.Controllers
                     request.ProfilePictureUrl, request.DefaultProfilePictureHex);
             var tokenWithoutPassword = _authService.TryGetTokenWithoutPassword(request.Email);
             return Ok(new LoginResponse(existedUser, tokenWithoutPassword));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("confirmation")]
+
+        public async Task<IActionResult> TryAddNewAccountConfirmationRequest(AddNewAccountConfirmationRequest request)
+        {
+            var existedUser = _userService.GetUserByEmail(request.Email);
+            if (existedUser is null)
+                return BadRequest("User does not exist");
+            if (existedUser.IsLocked)
+                return BadRequest($"Account {existedUser.Email} is locked");
+
+            var newRequest = _authService.CreateNewConfirmationRequest(existedUser.Email);
+
+            try
+            {
+                await _emailSender.SendEmail(existedUser.Email,
+                    "GradeBook: Confirm your account", 
+                    $"Confirm your account with the following code: {newRequest.ConfirmationCode}");
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest($"Error while sending the email: {ex.Message}");
+            }
+
+            return Ok($"Sent email to address {existedUser.Email}");
         }
     }
 }

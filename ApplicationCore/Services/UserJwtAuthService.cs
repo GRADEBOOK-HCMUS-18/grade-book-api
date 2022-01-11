@@ -14,13 +14,15 @@ namespace ApplicationCore.Services
     {
         private readonly ILogger<UserJwtAuthService> _logger;
         private readonly IBaseRepository<User> _repository;
+        private readonly IBaseRepository<AccountConfirmationRequest> _confirmationRepository;
 
         public UserJwtAuthService(
             ILogger<UserJwtAuthService> logger,
-            IBaseRepository<User> repository)
+            IBaseRepository<User> repository, IBaseRepository<AccountConfirmationRequest> confirmationRepository)
         {
             _logger = logger;
             _repository = repository;
+            _confirmationRepository = confirmationRepository;
         }
 
         public string TryGetToken(string email, string password)
@@ -58,6 +60,18 @@ namespace ApplicationCore.Services
             _repository.Insert(userToAdd);
 
             return userToAdd;
+        }
+
+        public AccountConfirmationRequest CreateNewConfirmationRequest(string email)
+        {
+            var foundUser = _repository.GetFirst(user => user.Email == email);
+
+            var newConfirmationRequest = new AccountConfirmationRequest(foundUser);
+
+            _confirmationRepository.Insert(newConfirmationRequest);
+
+            return newConfirmationRequest;
+
         }
 
 

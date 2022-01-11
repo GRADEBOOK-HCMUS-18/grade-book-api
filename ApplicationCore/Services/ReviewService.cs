@@ -119,7 +119,6 @@ namespace ApplicationCore.Services
 
             return _replyRepository.Insert(newReply);
 
-
         }
 
         public void UpdateGradeReviewState(int reviewId, string newState)

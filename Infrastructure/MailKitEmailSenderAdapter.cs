@@ -18,7 +18,7 @@ namespace Infrastructure
             _smtpClient = new SmtpClient();
         }
 
-        private async Task SendEmail(string address, string subject, string htmlMessage)
+        public async Task SendEmail(string address, string subject, string htmlMessage)
         {
             var senderAddress = _configuration["MailSettings:Account"];
             var email = new MimeMessage {Sender = new MailboxAddress("GradeBook", senderAddress)};

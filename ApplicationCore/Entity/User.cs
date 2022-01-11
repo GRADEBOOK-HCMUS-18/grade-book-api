@@ -25,6 +25,9 @@ namespace ApplicationCore.Entity
 
         public IList<GradeReviewReply> GradeReviewReplies { get; set; } = new List<GradeReviewReply>();
 
+        public IList<AccountConfirmationRequest> AccountConfirmationRequests { get; set; } =
+            new List<AccountConfirmationRequest>();
+
         public void SetLockAccount(bool newState)
         {
             IsLocked = newState;
