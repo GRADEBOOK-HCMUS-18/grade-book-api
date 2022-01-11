@@ -14,11 +14,11 @@ namespace ApplicationCore.Interfaces
 
         void AddNewFinalizedGradeCompositionNotification(int assignmentId);
 
-        UserNotification AddNewGradeRequestNotification(AssignmentGradeReviewRequest request);
+        void AddNewGradeRequestNotification(int requestId);
 
-        UserNotification AddNewGradeReviewReplyNotification(GradeReviewReply reply);
+        void AddNewGradeReviewReplyNotification(int replyId);
 
-        UserNotification AddAcceptedOrRejectedGradeReviewNotification(AssignmentGradeReviewRequest request);
+        void AddAcceptedOrRejectedGradeReviewNotification(int requestId);
 
     }
 }

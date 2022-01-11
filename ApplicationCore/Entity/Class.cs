@@ -60,5 +60,13 @@ namespace ApplicationCore.Entity
                 if (indexInNewOrder > -1) assignment.Priority = (indexInNewOrder + 1) * 100;
             }
         }
+        
+        // get all teacher including main and sub 
+        public List<User> GetAllTeacher()
+        {
+            var result = ClassTeachersAccounts.Select(ct => ct.Teacher).ToList() ?? throw new ArgumentNullException("ClassTeachersAccounts.Select(ct => ct.Teacher).ToList()");
+            result.Add(this.MainTeacher);
+            return result;
+        }
     }
 }

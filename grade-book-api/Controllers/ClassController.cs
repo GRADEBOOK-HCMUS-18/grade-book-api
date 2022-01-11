@@ -204,7 +204,6 @@ namespace grade_book_api.Controllers
             if (GetCurrentUserRole(classId) is not ClassRole.Teacher)
                 return Unauthorized("User not a teacher in class");
             _ = _assignmentService.UpdateWholeClassAssignmentFinalization(classId, request.NewStatus);
-            // TODO: insert new finalization notification 
             return Ok();
         }
 
@@ -300,7 +299,9 @@ namespace grade_book_api.Controllers
                         GetCurrentUserIdFromToken(), 
                         request.RequestedNewPoint, 
                         request.Description);
+                
                 if (newReview is null) return BadRequest("No grade for student in class"); 
+                _notificationService.AddNewGradeRequestNotification(newReview.Id);
                 return Ok(new GradeReviewInformationResponse(newReview));
             }
             catch (Exception ex)
@@ -337,6 +338,7 @@ namespace grade_book_api.Controllers
                     _reviewService.AddReviewReplyAsTeacher(currentUserId, reviewId, request.Content);
                 // TODO: insert new grade request reply notification 
                 return Ok(new ReviewReplyResponse(result));
+                
             }
 
             if (currentUserRole is ClassRole.Student)
