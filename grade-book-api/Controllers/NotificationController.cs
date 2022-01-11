@@ -27,11 +27,24 @@ namespace grade_book_api.Controllers
 
             int numberOfNotViewedNotification = _notificationService.CountNotViewedNotification(userId);
             var response = new NotificationListResponse(pageNumber,listNotifications,numberOfNotViewedNotification);
-            
-            _notificationService.SetUserNotificationAsViewed(userId);
-
             return Ok(response);
         }
+
+        [HttpPut]
+        public IActionResult MarkAllNotificationAsRead()
+        {
+            _notificationService.SetAllUserNotificationAsViewed(GetCurrentUserIdFromToken());
+            return Ok("Set all notification to read");
+        }
+        
+        [HttpPut("{notificationId}")]
+        public IActionResult MarkSingleNotificationAsRead(int notificationId)
+        {
+            _notificationService.SetSingleUserNotificationAsViewed(notificationId);
+            return Ok("set single notification to read");
+        }
+        
+        
         private int GetCurrentUserIdFromToken()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);

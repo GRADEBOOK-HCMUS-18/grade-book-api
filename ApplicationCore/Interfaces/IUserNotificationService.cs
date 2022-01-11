@@ -8,7 +8,9 @@ namespace ApplicationCore.Interfaces
     {
         List<UserNotification> ReadPagedUserNotification(int userId,int pageNumber, int numOfNotificationPerPage);
 
-        void SetUserNotificationAsViewed(int userId);
+        void SetSingleUserNotificationAsViewed(int notificationId);
+
+        void SetAllUserNotificationAsViewed(int userId);
 
         int CountNotViewedNotification(int userId);
 

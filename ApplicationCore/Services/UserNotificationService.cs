@@ -40,7 +40,16 @@ namespace ApplicationCore.Services
             return listNotification.ToList();
         }
 
-        public void SetUserNotificationAsViewed(int userId)
+        public void SetSingleUserNotificationAsViewed(int notificationId)
+        {
+            var foundNotification = _notificationRepository.GetFirst(n => n.Id == notificationId);
+            foundNotification.IsViewed = true;
+
+            _notificationRepository.Update(foundNotification);
+
+        }
+
+        public void SetAllUserNotificationAsViewed(int userId)
         {
             var foundUser =
                 _userRepository
