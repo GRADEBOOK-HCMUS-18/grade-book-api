@@ -8,5 +8,9 @@ namespace ApplicationCore.Interfaces
 
         int CountTotalUser();
         List<User> GetPagedUsersList(int numberOfUserPerPage, int pageNumber);
+
+        int CountTotalClass();
+
+        List<Class> GetPagedClassesList(int numberOfClassPerPage, int pageNumber);
     }
 }

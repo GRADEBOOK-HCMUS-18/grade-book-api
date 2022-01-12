@@ -30,5 +30,18 @@ namespace ApplicationCore.Services
 
             return usersList.ToList();
         }
+
+        public int CountTotalClass()
+        {
+            return _classRepository.Count();
+        }
+
+        public List<Class> GetPagedClassesList(int numberOfClassPerPage, int pageNumber)
+        {
+            var classesList = 
+                _classRepository.List(new ClassWithPagingSpec(numberOfClassPerPage, pageNumber));
+            return classesList.ToList();
+
+        }
     }
 }
