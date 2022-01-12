@@ -20,6 +20,7 @@ namespace Infrastructure
         public DbSet<AssignmentGradeReviewRequest> AssignmentGradeReviewRequests { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<AccountConfirmationRequest> AccountConfirmationRequests { get; set; }
+        public DbSet<PasswordChangeRequest> PasswordChangeRequests { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,7 @@ namespace Infrastructure
 
             //modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
             SetupUserAndConfirmationRequestRelationship(modelBuilder);
+            SetupUserAndPasswordChangeRequestRelationship(modelBuilder);
             SetupClassAndStudentRelationship(modelBuilder);
             SetupAssignmentAndStudentRelationship(modelBuilder);
             SetupStudentGradeAndReviewRequestRelationship(modelBuilder);
@@ -51,6 +53,14 @@ namespace Infrastructure
                 .HasOne(confirm => confirm.User)
                 .WithMany(user => user.AccountConfirmationRequests)
                 .HasForeignKey(confirm => confirm.UserId);
+        }
+
+        private static void SetupUserAndPasswordChangeRequestRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PasswordChangeRequest>()
+                .HasOne(p => p.User)
+                .WithMany(user => user.PasswordChangeRequests)
+                .HasForeignKey(p => p.UserId);
         }
 
         private static void SetupAssignmentAndStudentRelationship(ModelBuilder modelBuilder)

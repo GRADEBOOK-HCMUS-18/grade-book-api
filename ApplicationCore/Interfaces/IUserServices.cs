@@ -14,6 +14,7 @@ namespace ApplicationCore.Interfaces
             string newEmail);
 
         public User UpdateUserPassword(int userId, string oldPassword, string newPassword);
+        public User UpdateUserPassword(int userId, string newPassword);
         public string UpdateUserAvatar(int id, Stream newPicture);
     }
 }

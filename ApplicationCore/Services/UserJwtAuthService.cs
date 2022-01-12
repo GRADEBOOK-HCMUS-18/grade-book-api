@@ -17,14 +17,17 @@ namespace ApplicationCore.Services
         private readonly ILogger<UserJwtAuthService> _logger;
         private readonly IBaseRepository<User> _repository;
         private readonly IBaseRepository<AccountConfirmationRequest> _confirmationRepository;
+        private readonly IBaseRepository<PasswordChangeRequest> _passwordForgotRepository;
 
         public UserJwtAuthService(
             ILogger<UserJwtAuthService> logger,
-            IBaseRepository<User> repository, IBaseRepository<AccountConfirmationRequest> confirmationRepository)
+            IBaseRepository<User> repository, IBaseRepository<AccountConfirmationRequest> confirmationRepository,
+            IBaseRepository<PasswordChangeRequest> passwordForgotRepository)
         {
             _logger = logger;
             _repository = repository;
             _confirmationRepository = confirmationRepository;
+            _passwordForgotRepository = passwordForgotRepository;
         }
 
         public string TryGetToken(string email, string password)
@@ -73,22 +76,21 @@ namespace ApplicationCore.Services
             _confirmationRepository.Insert(newConfirmationRequest);
 
             return newConfirmationRequest;
-
         }
 
         public User UpdateEmailConfirmationState(int userId, string confirmationCode)
         {
             var currentDateTime = DateTime.Now;
-            var foundRequests = 
-                _confirmationRepository.List(confirm 
-                        => confirm.UserId == userId &&
-                           !confirm.IsFinished && 
-                           confirm.DateTime.AddMinutes(10) >= currentDateTime,
+            var foundRequests =
+                _confirmationRepository.List(confirm
+                            => confirm.UserId == userId &&
+                               !confirm.IsFinished &&
+                               confirm.DateTime.AddMinutes(10) >= currentDateTime,
                         include: c => c.Include(cf => cf.User))
                     .ToList();
             if (foundRequests.Count < 1)
                 throw new InvalidOperationException(
-                    "Invalid confirmation, you have maximum 5 minutes to confirm. Try again");
+                    "Invalid confirmation, you have maximum 10 minutes to confirm. Try again");
 
             var request = foundRequests
                 .OrderByDescending(r => r.DateTime)
@@ -98,15 +100,55 @@ namespace ApplicationCore.Services
                 throw new InvalidOperationException("Already confirmed");
 
             if (confirmationCode != request.ConfirmationCode)
-            {
                 throw new InvalidOperationException($"Confirmation code {confirmationCode} is wrong");
-            }
 
             request.User.IsEmailConfirmed = true;
             request.IsFinished = true;
             _confirmationRepository.Update(request);
 
             return request.User;
+        }
+
+        public PasswordChangeRequest CreateNewForgotPasswordRequest(string email)
+        {
+            var foundUser = _repository.GetFirst(user => user.Email == email);
+
+            var forgotPasswordRequest = new PasswordChangeRequest(foundUser);
+
+            _passwordForgotRepository.Insert(forgotPasswordRequest);
+
+            return forgotPasswordRequest;
+        }
+
+        public string UpdatePasswordWithCode(string email, string confirmationCode)
+        {
+            var currentDateTime = DateTime.Now;
+            var foundRequests =
+                _passwordForgotRepository.List(confirm
+                            => confirm.User.Email == email &&
+                               !confirm.IsFinished &&
+                               confirm.DateTime.AddMinutes(10) >= currentDateTime,
+                        include: c => c.Include(cf => cf.User))
+                    .ToList();
+            if (foundRequests.Count < 1)
+                throw new InvalidOperationException(
+                    "Invalid confirmation, you have maximum 10 minutes to confirm. Try again");
+
+            var request = foundRequests
+                .OrderByDescending(r => r.DateTime)
+                .First();
+
+            if (request.IsFinished)
+                throw new InvalidOperationException("Already done with this request");
+
+            if (confirmationCode != request.ConfirmationCode)
+                throw new InvalidOperationException($"Confirmation code {confirmationCode} is wrong");
+            
+            request.IsFinished = true;
+            _passwordForgotRepository.Update(request);
+
+            return GenerateJwtToken(request.User);
+
         }
 
 

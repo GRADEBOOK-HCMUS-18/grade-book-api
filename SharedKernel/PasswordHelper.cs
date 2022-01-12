@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -6,6 +7,11 @@ namespace SharedKernel
 {
     public static class PasswordHelper
     {
+        public static string GenerateRandomLetterString()
+        {
+            var resultGuid = string.Concat(Guid.NewGuid().ToString().Select(c => (char) (c + 17)));
+            return resultGuid.Substring(resultGuid.Length - 12);
+        }
         public static void HashPassword(string inputPassword, out byte[] salt, out byte[] hash)
         {
             if (inputPassword is null)

@@ -1,10 +1,9 @@
 using System;
-using System.Linq;
 using SharedKernel;
 
 namespace ApplicationCore.Entity
 {
-    public class AccountConfirmationRequest: BaseEntity
+    public class PasswordChangeRequest: BaseEntity
     {
         public int UserId { get; set; }
 
@@ -16,16 +15,18 @@ namespace ApplicationCore.Entity
         
         public bool IsFinished { get; set; }
         
-        public AccountConfirmationRequest(){}
+        
+        public PasswordChangeRequest(){}
 
-        public AccountConfirmationRequest(User user)
+        public PasswordChangeRequest(User user)
         {
-            this.User = user;
-            this.UserId = user.Id;
-            IsFinished = false;
+            User = user;
+            UserId = user.Id;
+            DateTime = DateTime.Now;
             ConfirmationCode = PasswordHelper.GenerateRandomLetterString();
-            DateTime = DateTime.Now;    
+            IsFinished = false;
         }
+        
         
     }
 }

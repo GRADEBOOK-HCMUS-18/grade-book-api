@@ -29,6 +29,8 @@ namespace ApplicationCore.Entity
         public IList<AccountConfirmationRequest> AccountConfirmationRequests { get; set; } =
             new List<AccountConfirmationRequest>();
 
+        public IList<PasswordChangeRequest> PasswordChangeRequests { get; set; } = new List<PasswordChangeRequest>();
+
         public void SetLockAccount(bool newState)
         {
             IsLocked = newState;

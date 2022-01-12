@@ -95,7 +95,7 @@ namespace grade_book_api.Controllers
         
         [HttpPost("confirmation")]
 
-        public async Task<IActionResult> TryAddNewAccountConfirmationRequest(AddNewAccountConfirmationRequest request)
+        public async Task<IActionResult> TryAddNewAccountConfirmationRequest()
         {
             int currentUserId = GetCurrentUserIdFromToken();
             var existedUser = _userService.GetUserById(currentUserId);
@@ -135,6 +135,51 @@ namespace grade_book_api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
+        [AllowAnonymous]
+        [HttpPost("forgotPassword")]
+        public async Task<IActionResult> TryAddNewForgotPasswordRequest(AddNewForgotPasswordRequest request)
+        {
+            
+            var existedUser = _userService.GetUserByEmail(request.Email);
+            if (existedUser is null)
+                return BadRequest("User does not exist");
+            if (existedUser.IsLocked)
+                return BadRequest($"Account {existedUser.Email} is locked");
+
+            var newRequest = _authService.CreateNewForgotPasswordRequest(request.Email);
+            string emailSubject = "GradeBook: Change your password";
+            string emailContent =
+                $"Change your password using the following confirmation code {newRequest.ConfirmationCode}";
+            try
+            {
+                await _emailSender.SendEmail(request.Email, emailSubject, emailContent);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Email error: {ex.Message}");
+            }
+
+            return Ok($"Send email to the address {request.Email}");
+        }
+
+
+        [AllowAnonymous]
+        [HttpPost("forgotPassword/code")]
+        public IActionResult TryConfirmForgotPasswordRequest(TryConfirmCodeWhenForgotPassword request)
+        {
+            try
+            {
+                string newToken = _authService.UpdatePasswordWithCode(request.Email, request.ConfirmationCode);
+                return Ok(new {token = newToken});
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        
         private int GetCurrentUserIdFromToken()
         {
             var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);

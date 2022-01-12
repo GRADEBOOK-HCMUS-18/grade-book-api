@@ -8,13 +8,13 @@ using SharedKernel;
 
 namespace ApplicationCore.Services
 {
-    public class UserService : IUserServices 
+    public class UserService : IUserServices
     {
         private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
         private readonly IBaseRepository<User> _userRepository;
 
-        public UserService( IBaseRepository<User> userRepository,
+        public UserService(IBaseRepository<User> userRepository,
             ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository)
         {
             _userRepository = userRepository;
@@ -48,7 +48,7 @@ namespace ApplicationCore.Services
         {
             var found = _userRepository.GetFirst(user => user.StudentIdentification == studentIdentification);
             if (found is null) return null;
-            return found; 
+            return found;
         }
 
         public ClassRole GetUserRoleInClass(int userId, int classId)
@@ -86,7 +86,8 @@ namespace ApplicationCore.Services
                 var foundExistedStudent =
                     _userRepository.GetFirst(user => user.StudentIdentification == newStudentIdentification);
                 if (foundExistedStudent is not null)
-                    throw new ApplicationException($"Student with student Id {newStudentIdentification} already exists");
+                    throw new ApplicationException(
+                        $"Student with student Id {newStudentIdentification} already exists");
 
                 found.StudentIdentification = newStudentIdentification;
             }
@@ -118,6 +119,22 @@ namespace ApplicationCore.Services
                 if (!validOldPassword)
                     return null;
             }
+
+            PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
+            found.PasswordHash = newHash;
+            found.PasswordSalt = newSalt;
+            found.IsPasswordNotSet = false;
+
+            _ = _userRepository.Update(found);
+            return found;
+        }
+
+        public User UpdateUserPassword(int userId, string newPassword)
+        {
+            var found = _userRepository.GetFirst(user => user.Id == userId);
+            if (found is null)
+                throw new ApplicationException("User does not exist");
+
 
             PasswordHelper.HashPassword(newPassword, out var newSalt, out var newHash);
             found.PasswordHash = newHash;

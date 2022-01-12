@@ -15,5 +15,9 @@ namespace ApplicationCore.Interfaces
         AccountConfirmationRequest CreateNewConfirmationRequest(string email);
 
         User UpdateEmailConfirmationState(int userId, string confirmationCode);
+
+        PasswordChangeRequest CreateNewForgotPasswordRequest(string email);
+
+        string UpdatePasswordWithCode(string email, string confirmationCode);
     }
 }

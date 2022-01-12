@@ -1,6 +1,6 @@
 namespace grade_book_api.Requests
 {
-    public class AddNewAccountConfirmationRequest
+    public class AddNewForgotPasswordRequest
     {
         public string Email { get; set; }
     }

@@ -76,6 +76,24 @@ namespace grade_book_api.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("password")]
+        public IActionResult UpdateUserPassword([FromBody] AddNewUserPasswordRequest request)
+        {
+              try
+              {
+                  var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+                  var result = _userServices.UpdateUserPassword(userId,request.NewPassword);
+                  if (result is not null)
+                      return Ok(new UserInformationResponse(result));
+                  return BadRequest("Failed");
+              }
+              catch (ApplicationException ex)
+              {
+                  return NotFound(ex.Message);
+              }
+        }
+
         [HttpPut]
         [Route("avatar")]
         public IActionResult UpdateUserAvatar(IFormFile image)
