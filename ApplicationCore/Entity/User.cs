@@ -18,6 +18,7 @@ namespace ApplicationCore.Entity
         public bool IsPasswordNotSet { get; set; } = false;
         
         public bool IsLocked { get; set; } 
+        public bool IsEmailConfirmed { get; set; }
         public IList<ClassStudentsAccount> ClassStudentsAccounts { get; set; } = new List<ClassStudentsAccount>();
         public IList<ClassTeachersAccount> ClassTeachersAccounts { get; set; } = new List<ClassTeachersAccount>();
 

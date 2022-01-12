@@ -1,9 +1,11 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SharedKernel;
@@ -72,6 +74,39 @@ namespace ApplicationCore.Services
 
             return newConfirmationRequest;
 
+        }
+
+        public User UpdateEmailConfirmationState(int userId, string confirmationCode)
+        {
+            var currentDateTime = DateTime.Now;
+            var foundRequests = 
+                _confirmationRepository.List(confirm 
+                        => confirm.UserId == userId &&
+                           !confirm.IsFinished && 
+                           confirm.DateTime.AddMinutes(10) >= currentDateTime,
+                        include: c => c.Include(cf => cf.User))
+                    .ToList();
+            if (foundRequests.Count < 1)
+                throw new InvalidOperationException(
+                    "Invalid confirmation, you have maximum 5 minutes to confirm. Try again");
+
+            var request = foundRequests
+                .OrderByDescending(r => r.DateTime)
+                .First();
+
+            if (request.IsFinished)
+                throw new InvalidOperationException("Already confirmed");
+
+            if (confirmationCode != request.ConfirmationCode)
+            {
+                throw new InvalidOperationException($"Confirmation code {confirmationCode} is wrong");
+            }
+
+            request.User.IsEmailConfirmed = true;
+            request.IsFinished = true;
+            _confirmationRepository.Update(request);
+
+            return request.User;
         }
 
 

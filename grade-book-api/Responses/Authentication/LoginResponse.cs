@@ -12,6 +12,7 @@ namespace grade_book_api.Responses.Authentication
             ProfilePictureUrl = user.ProfilePictureUrl;
             DefaultProfilePictureHex = user.DefaultProfilePictureHex;
             IsPasswordNotSet = user.IsPasswordNotSet;
+            IsEmailConfirmed = user.IsEmailConfirmed;
         }
 
 
@@ -24,5 +25,6 @@ namespace grade_book_api.Responses.Authentication
 
         public string DefaultProfilePictureHex { get; set; }
         public bool IsPasswordNotSet { get; set; }
+        public bool IsEmailConfirmed { get; set; }
     }
 }

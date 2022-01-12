@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace grade_book_api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AuthenticationController : ControllerBase
@@ -90,13 +92,13 @@ namespace grade_book_api.Controllers
             var tokenWithoutPassword = _authService.TryGetTokenWithoutPassword(request.Email);
             return Ok(new LoginResponse(existedUser, tokenWithoutPassword));
         }
-
-        [AllowAnonymous]
+        
         [HttpPost("confirmation")]
 
         public async Task<IActionResult> TryAddNewAccountConfirmationRequest(AddNewAccountConfirmationRequest request)
         {
-            var existedUser = _userService.GetUserByEmail(request.Email);
+            int currentUserId = GetCurrentUserIdFromToken();
+            var existedUser = _userService.GetUserById(currentUserId);
             if (existedUser is null)
                 return BadRequest("User does not exist");
             if (existedUser.IsLocked)
@@ -117,6 +119,26 @@ namespace grade_book_api.Controllers
             }
 
             return Ok($"Sent email to address {existedUser.Email}");
+        }
+        
+        [HttpPost("confirmation/code")]
+        public IActionResult TryConfirmAccount(TryConfirmationRequest request)
+        {
+            int currentUserId = GetCurrentUserIdFromToken();
+            try
+            {
+                _ = _authService.UpdateEmailConfirmationState(currentUserId, request.ConfirmationCode);
+                return Ok("Confirmed email");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        private int GetCurrentUserIdFromToken()
+        {
+            var userId = int.Parse(HttpContext.User.Claims.First(c => c.Type == "ID").Value);
+            return userId;
         }
     }
 }

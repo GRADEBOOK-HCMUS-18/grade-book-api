@@ -12,6 +12,7 @@ namespace grade_book_api.Responses.User
             IsPasswordNotSet = source.IsPasswordNotSet;
             StudentIdentification = source.StudentIdentification;
             IsLocked = source.IsLocked;
+            IsEmailConfirmed = source.IsEmailConfirmed;
         }
 
         public string Email { get; set; }
@@ -24,5 +25,7 @@ namespace grade_book_api.Responses.User
         public bool IsPasswordNotSet { get; set; }
         
         public bool IsLocked { get; set; }
+        
+        public bool IsEmailConfirmed { get; set; }
     }
 }

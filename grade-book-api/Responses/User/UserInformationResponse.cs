@@ -11,7 +11,10 @@ namespace grade_book_api.Responses.User
             DefaultProfilePictureHex = source.DefaultProfilePictureHex;
             StudentIdentification = source.StudentIdentification;
             IsLocked = source.IsLocked;
+            IsEmailConfirmed = source.IsEmailConfirmed;
         }
+
+        public bool IsEmailConfirmed { get; set; }
 
         public string Email { get; set; }
         public string FirstName { get; set; }

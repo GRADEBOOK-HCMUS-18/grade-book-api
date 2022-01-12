@@ -13,5 +13,7 @@ namespace ApplicationCore.Interfaces
             string profilePictureUrl, string defaultProfilePictureHex);
 
         AccountConfirmationRequest CreateNewConfirmationRequest(string email);
+
+        User UpdateEmailConfirmationState(int userId, string confirmationCode);
     }
 }

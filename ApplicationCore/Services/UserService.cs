@@ -97,6 +97,7 @@ namespace ApplicationCore.Services
                 if (foundExistedStudent is not null)
                     throw new ApplicationException($"User with {newEmail} email already exists");
                 found.Email = newEmail;
+                found.IsEmailConfirmed = false;
             }
 
 
