@@ -21,6 +21,7 @@ namespace Infrastructure
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<AccountConfirmationRequest> AccountConfirmationRequests { get; set; }
         public DbSet<PasswordChangeRequest> PasswordChangeRequests { get; set; }
+        public DbSet<AdminAccount> AdminAccounts { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +47,8 @@ namespace Infrastructure
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
         }
+
+ 
 
         private static void SetupUserAndConfirmationRequestRelationship(ModelBuilder modelBuilder)
         {

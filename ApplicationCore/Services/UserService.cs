@@ -13,13 +13,16 @@ namespace ApplicationCore.Services
         private readonly IBaseRepository<Class> _classRepository;
         private readonly ICloudPhotoHandler _cloudPhotoHandler;
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<AdminAccount> _adminAccountRepository;
 
         public UserService(IBaseRepository<User> userRepository,
-            ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository)
+            ICloudPhotoHandler cloudPhotoHandler, IBaseRepository<Class> classRepository,
+            IBaseRepository<AdminAccount> adminAccountRepository)
         {
             _userRepository = userRepository;
             _cloudPhotoHandler = cloudPhotoHandler;
             _classRepository = classRepository;
+            _adminAccountRepository = adminAccountRepository;
         }
 
         public User GetUserById(int id)
@@ -71,6 +74,23 @@ namespace ApplicationCore.Services
                 return ClassRole.Student;
             return ClassRole.NotAMember;
         }
+
+        public bool IsUserAdmin(int userId)
+        {
+            var foundAdmin = _adminAccountRepository.GetFirst(a => a.User.Id == userId, 
+                accounts => accounts.Include(a => a.User));
+
+            return (foundAdmin is not null);
+        }
+
+        public bool IsUserSuperAdmin(int userId)
+        {
+            var foundAdmin = _adminAccountRepository.GetFirst(a => a.User.Id == userId, 
+                accounts => accounts.Include(a => a.User));
+
+            return (foundAdmin is not null && foundAdmin.IsSuperAdmin);
+        }
+
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
             string newEmail)
