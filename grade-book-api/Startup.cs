@@ -87,7 +87,8 @@ namespace grade_book_api
             services.AddSingleton(Configuration);
             services.AddSingleton(cloudinary);
             services.AddScoped<IUserNotificationService, UserNotificationService>();
-            
+            services.AddScoped<IAdminService, AdminService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
