@@ -1,7 +1,9 @@
 using System.Linq;
 using ApplicationCore.Interfaces;
+using grade_book_api.Requests;
 using grade_book_api.Requests.Admin;
 using grade_book_api.Responses.Admin;
+using grade_book_api.Responses.Authentication;
 using grade_book_api.Responses.Class;
 using grade_book_api.Responses.User;
 using Microsoft.AspNetCore.Authorization;
@@ -19,11 +21,32 @@ namespace grade_book_api.Controllers
         private readonly IUserServices _userServices;
         private readonly IAdminService _adminService;
         private readonly IClassService _classService;
-        public AdminApiController(IUserServices userServices, IAdminService adminService, IClassService classService)
+        private readonly IUserJwtAuthService _authService;
+        public AdminApiController(IUserServices userServices, IAdminService adminService, IClassService classService, IUserJwtAuthService authService)
         {
             _userServices = userServices;
             _adminService = adminService;
             _classService = classService;
+            _authService = authService;
+        }
+        
+        [AllowAnonymous]
+        [HttpPost("authentication")]
+        public IActionResult TryAuthenticate(AuthenticateRequest request)
+        {
+            var foundUser = _userServices.GetUserByEmail(request.Email);
+            if (foundUser is null) return Unauthorized("Account does not exist");
+            if (foundUser.IsLocked)
+                return Unauthorized("Your account is locked");
+            if (!_userServices.IsUserAdmin(foundUser.Id)) return Unauthorized(UnauthorizedString);
+
+            string token = _authService.TryGetToken(request.Email, request.Password);
+
+            if (token is null) return Unauthorized("Wrong credential");
+
+            return Ok(new LoginResponse(foundUser, token)); 
+
+
         }
 
         [HttpGet("user")]
@@ -53,9 +76,16 @@ namespace grade_book_api.Controllers
         }
 
         [HttpPut("user/{userId}/lockState")]
-        public IActionResult ChangeLockedStateOfAUser(int userId)
+        public IActionResult ChangeLockedStateOfAUser(int userId, ChangeUserLockStateRequest request)
         {
-            return Ok("");
+            int currentUserId = GetCurrentUserIdFromToken();
+            if (!_userServices.IsUserAdmin(currentUserId)) return Unauthorized(UnauthorizedString);
+            if (currentUserId == userId) return BadRequest($"Cannot lock your self: {currentUserId}");
+            var user = _adminService.SetLockStateOfUser(userId, request.NewLockState);
+
+            if (user is null) return NotFound();
+
+            return Ok(new UserDetailedInformationResponse(user));
         }
 
         [HttpGet("class")]
@@ -69,7 +99,7 @@ namespace grade_book_api.Controllers
 
             return Ok(response);
         }
-
+    
         [HttpGet("class/{classId}")]
         public IActionResult GetSingleClassDetail(int classId)
         {

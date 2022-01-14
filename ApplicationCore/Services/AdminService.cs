@@ -43,5 +43,16 @@ namespace ApplicationCore.Services
             return classesList.ToList();
 
         }
+
+        public User SetLockStateOfUser(int userId, bool newState)
+        {
+            var foundUser = _userRepository.GetFirst(user => user.Id == userId);
+            if (foundUser is null)
+                return null; 
+            foundUser.SetLockAccount(newState);
+
+            _userRepository.Update(foundUser);
+            return foundUser;
+        }
     }
 }

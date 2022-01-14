@@ -12,5 +12,7 @@ namespace ApplicationCore.Interfaces
         int CountTotalClass();
 
         List<Class> GetPagedClassesList(int numberOfClassPerPage, int pageNumber);
+
+        User SetLockStateOfUser(int userId, bool newState);
     }
 }
