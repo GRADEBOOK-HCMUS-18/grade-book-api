@@ -106,14 +106,25 @@ namespace grade_book_api.Controllers
             
             if (!_userServices.IsUserAdmin(GetCurrentUserIdFromToken())) return Unauthorized(UnauthorizedString);
             var foundClass = _classService.GetClassDetail(classId);
-
-            if (foundClass is null)
-                return NotFound();
+            if (foundClass is null) return NotFound();
             var response = new ClassDetailInformationResponse(foundClass, true);
 
             return Ok(response);
-
         }
+
+        [HttpGet("adminAccount")]
+        public IActionResult GetPagedAdminAccountList([FromQuery] int numberPerPage, [FromQuery] int pageNumber)
+        {
+            if (!_userServices.IsUserAdmin(GetCurrentUserIdFromToken())) return Unauthorized(UnauthorizedString);
+
+            var listAdmins = _adminService.GetPagedAdminsList(numberPerPage, pageNumber);
+            int total = _adminService.CountTotalAdmin();
+            var response = new PagedAdminListResponse(numberPerPage, pageNumber, total, listAdmins);
+
+            return Ok(response);
+        }
+        
+        
         
         private int GetCurrentUserIdFromToken()
         {

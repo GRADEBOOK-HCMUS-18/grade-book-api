@@ -13,6 +13,9 @@ namespace ApplicationCore.Interfaces
 
         List<Class> GetPagedClassesList(int numberOfClassPerPage, int pageNumber);
 
+        int CountTotalAdmin();
+        List<AdminAccount> GetPagedAdminsList(int numberPerPage, int pageNumber); 
+
         User SetLockStateOfUser(int userId, bool newState);
     }
 }

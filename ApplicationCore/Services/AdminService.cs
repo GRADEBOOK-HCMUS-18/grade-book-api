@@ -44,6 +44,18 @@ namespace ApplicationCore.Services
 
         }
 
+        public int CountTotalAdmin()
+        {
+            return _adminAccountRepository.Count();
+        }
+
+        public List<AdminAccount> GetPagedAdminsList(int numberPerPage, int pageNumber)
+        {
+            var adminList =
+                _adminAccountRepository.List(new AdminWithPagingSpec(numberPerPage, pageNumber));
+            return adminList.ToList();
+        }
+
         public User SetLockStateOfUser(int userId, bool newState)
         {
             var foundUser = _userRepository.GetFirst(user => user.Id == userId);
