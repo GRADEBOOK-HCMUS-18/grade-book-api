@@ -4,6 +4,7 @@ namespace grade_book_api.Responses.User
     {
         public UserDetailedInformationResponse(ApplicationCore.Entity.User source)
         {
+            Id = source.Id;
             Email = source.Email;
             FirstName = source.FirstName;
             LastName = source.LastName;
@@ -14,6 +15,8 @@ namespace grade_book_api.Responses.User
             IsLocked = source.IsLocked;
             IsEmailConfirmed = source.IsEmailConfirmed;
         }
+        
+        public int Id { get; set; }
 
         public string Email { get; set; }
         public string FirstName { get; set; }
