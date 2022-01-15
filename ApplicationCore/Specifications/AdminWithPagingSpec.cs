@@ -7,8 +7,8 @@ namespace ApplicationCore.Specifications
     {
         public AdminWithPagingSpec(int numberPerPage, int pageNumber)
         {
-            Query.Include(admin => admin.User)
-                .OrderByDescending(admin => admin.User.Id)
+            Query
+                .OrderByDescending(admin => admin.Id)
                 .Skip((pageNumber - 1) * numberPerPage)
                 .Take(numberPerPage);
         }

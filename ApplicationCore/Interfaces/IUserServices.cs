@@ -10,9 +10,9 @@ namespace ApplicationCore.Interfaces
         public User GetUserByStudentIdentification(string studentIdentification);
         public ClassRole GetUserRoleInClass(int userId, int classId);
 
-        public bool IsUserAdmin(int userId);
+        public bool IsUserAdmin(int adminId);
 
-        public bool IsUserSuperAdmin(int userId);
+        public bool IsUserSuperAdmin(int adminId);
 
         public User UpdateUser(int id, string newFirstname, string newLastname, string newStudentIdentification,
             string newEmail);

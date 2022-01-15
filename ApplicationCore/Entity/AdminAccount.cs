@@ -3,13 +3,15 @@ namespace ApplicationCore.Entity
     public class AdminAccount: BaseEntity
     {
         
-        public User User { get; set; }
         
+        public string Username { get; set; }
         public bool IsSuperAdmin { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
 
-        public AdminAccount(User user, bool isSuperAdmin)
+        public AdminAccount(string username, bool isSuperAdmin)
         {
-            User = user;
+            Username = username;
             IsSuperAdmin = isSuperAdmin;
         }
         

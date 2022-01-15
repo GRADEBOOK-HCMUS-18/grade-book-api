@@ -6,12 +6,13 @@ namespace grade_book_api.Responses.Admin
     public class AdminAccountResponse
     {
         public bool IsSuperAdmin { get; set; }
-        public UserDetailedInformationResponse User { get; set; }
+        
+        public string Username { get; set; }
 
         public AdminAccountResponse(AdminAccount account)
         {
             IsSuperAdmin = account.IsSuperAdmin;
-            User = new UserDetailedInformationResponse(account.User);
+            Username = account.Username;
         }
         
     }

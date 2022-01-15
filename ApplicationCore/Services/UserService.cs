@@ -75,18 +75,16 @@ namespace ApplicationCore.Services
             return ClassRole.NotAMember;
         }
 
-        public bool IsUserAdmin(int userId)
+        public bool IsUserAdmin(int adminId)
         {
-            var foundAdmin = _adminAccountRepository.GetFirst(a => a.User.Id == userId, 
-                accounts => accounts.Include(a => a.User));
+            var foundAdmin = _adminAccountRepository.GetFirst(a => a.Id == adminId);
 
             return (foundAdmin is not null);
         }
 
-        public bool IsUserSuperAdmin(int userId)
+        public bool IsUserSuperAdmin(int adminId)
         {
-            var foundAdmin = _adminAccountRepository.GetFirst(a => a.User.Id == userId, 
-                accounts => accounts.Include(a => a.User));
+            var foundAdmin = _adminAccountRepository.GetFirst(a => a.Id == adminId);
 
             return (foundAdmin is not null && foundAdmin.IsSuperAdmin);
         }

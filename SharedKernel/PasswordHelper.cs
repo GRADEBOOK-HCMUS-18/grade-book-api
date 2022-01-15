@@ -1,12 +1,40 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SharedKernel
 {
     public static class PasswordHelper
     {
+        private static string GenerateJwtToken(int userId, string emailOrUsername)
+        {
+            var hourToRefresher = 48;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("3aacfb02-b67b-4923-8a2d-21a103902b91"));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("ID", userId.ToString()),
+                    new Claim(ClaimTypes.Email, emailOrUsername)
+                }),
+                SigningCredentials = credentials,
+                Expires = DateTime.Now.AddHours(hourToRefresher)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return tokenString;
+        }
         public static string GenerateRandomLetterString()
         {
             var resultGuid = string.Concat(Guid.NewGuid().ToString().Select(c => (char) (c + 17)));
