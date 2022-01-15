@@ -1,5 +1,5 @@
+using System;
 using ApplicationCore.Entity;
-using grade_book_api.Responses.User;
 
 namespace grade_book_api.Responses.Admin
 {
@@ -9,12 +9,14 @@ namespace grade_book_api.Responses.Admin
         public bool IsSuperAdmin { get; set; }
         
         public string Username { get; set; }
+        public DateTime DateCreated { get; set; }
 
         public AdminAccountResponse(AdminAccount account)
         {
             Id = account.Id;
             IsSuperAdmin = account.IsSuperAdmin;
             Username = account.Username;
+            DateCreated = account.DateCreated;
         }
         
     }
