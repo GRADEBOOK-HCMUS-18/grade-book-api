@@ -1,3 +1,4 @@
+using System;
 using SharedKernel;
 
 namespace ApplicationCore.Entity
@@ -8,6 +9,8 @@ namespace ApplicationCore.Entity
         
         public string Username { get; set; }
         public bool IsSuperAdmin { get; set; }
+        
+        public DateTime DateCreated { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
@@ -15,6 +18,7 @@ namespace ApplicationCore.Entity
         {
             Username = username;
             IsSuperAdmin = isSuperAdmin;
+            DateCreated = DateTime.Now;
             PasswordHelper.HashPassword(password,out var newPasswordSalt, out var newPasswordHash );
 
             PasswordHash = newPasswordHash;

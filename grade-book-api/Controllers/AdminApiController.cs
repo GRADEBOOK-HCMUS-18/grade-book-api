@@ -103,6 +103,12 @@ namespace grade_book_api.Controllers
             return Ok(new UserDetailedInformationResponse(user));
         }
 
+        [HttpPut("user/{userId}/studentIdentification")]
+        public IActionResult ChangeStudentIdentificationOfAUser(int userId)
+        {
+            return Ok("doing");
+        }
+
         [HttpGet("class")]
         public IActionResult GetPagedClassList([FromQuery] int numberPerPage, [FromQuery] int pageNumber)
         {
