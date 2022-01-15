@@ -5,6 +5,10 @@ namespace ApplicationCore.Interfaces
 {
     public interface IAdminService
     {
+        AdminAccount GetAdminByUsername(string userName);
+        AdminAccount CreateNewAdminAccount(string userName, string password, bool isSuperAdmin);
+
+        string TryGetAdminToken(string userName, string password);
 
         int CountTotalUser();
         List<User> GetPagedUsersList(int numberOfUserPerPage, int pageNumber);

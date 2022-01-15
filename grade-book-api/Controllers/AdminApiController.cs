@@ -1,6 +1,6 @@
+using System;
 using System.Linq;
 using ApplicationCore.Interfaces;
-using grade_book_api.Requests;
 using grade_book_api.Requests.Admin;
 using grade_book_api.Responses.Admin;
 using grade_book_api.Responses.Authentication;
@@ -29,25 +29,40 @@ namespace grade_book_api.Controllers
             _classService = classService;
             _authService = authService;
         }
+
+        [HttpPost("authentication/register")]
+        public IActionResult TryRegisterNewAdmin(CreateNewAdminRequest request)
+        {
+            if (!_userServices.IsUserSuperAdmin(GetCurrentUserIdFromToken()))
+                return Unauthorized(UnauthorizedAdminString);
+            try
+            {
+                var result = _adminService.CreateNewAdminAccount(request.Username, request.Password, request.IsSuperAdmin);
+                return Ok(new AdminAccountResponse(result));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
         
         [AllowAnonymous]
         [HttpPost("authentication")]
-        public IActionResult TryAuthenticate(AuthenticateRequest request)
+        public IActionResult TryAuthenticate(AdminAuthenticationRequest request)
         {
-            var foundUser = _userServices.GetUserByEmail(request.Email);
-            if (foundUser is null) return Unauthorized("Account does not exist");
-            if (foundUser.IsLocked)
-                return Unauthorized("Your account is locked");
-            if (!_userServices.IsUserAdmin(foundUser.Id)) return Unauthorized(UnauthorizedString);
+            var foundAdmin = _adminService.GetAdminByUsername(request.Username);
+            if (foundAdmin is null)
+                return Unauthorized($"Admin account {request.Username} does not exist");
+            string token = _adminService.TryGetAdminToken(request.Username, request.Password);
 
-            string token = _authService.TryGetToken(request.Email, request.Password);
+            if (token is null)
+                return Unauthorized("Wrong credential");
 
-            if (token is null) return Unauthorized("Wrong credential");
-
-            return Ok(new LoginResponse(foundUser, token)); 
-
+            return Ok(new AdminAuthenticationResponse(foundAdmin, token));
 
         }
+        
 
         [HttpGet("user")]
 

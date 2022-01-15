@@ -32,6 +32,11 @@ namespace Infrastructure
             modelBuilder.Entity<ClassTeachersAccount>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             SetupTeacherAccountAndClassRelationship(modelBuilder);
 
+            var initAdminAccount = new AdminAccount("admin", "admin123", true);
+            initAdminAccount.Id = 2022;
+
+            modelBuilder.Entity<AdminAccount>().HasData(initAdminAccount);
+
             //modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
             SetupUserAndConfirmationRequestRelationship(modelBuilder);
             SetupUserAndPasswordChangeRequestRelationship(modelBuilder);

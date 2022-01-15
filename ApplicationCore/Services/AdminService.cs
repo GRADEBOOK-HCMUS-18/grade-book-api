@@ -4,6 +4,7 @@ using System.Linq;
 using ApplicationCore.Entity;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Specifications;
+using SharedKernel;
 
 namespace ApplicationCore.Services
 {
@@ -18,6 +19,42 @@ namespace ApplicationCore.Services
             _userRepository = userRepository;
             _classRepository = classRepository;
         }
+
+        public AdminAccount GetAdminByUsername(string userName)
+        {
+            var foundAccount = _adminAccountRepository.GetFirst(admin => admin.Username == userName);
+            if (foundAccount is null)
+                return null;
+            return foundAccount;
+        }
+
+        public AdminAccount CreateNewAdminAccount(string userName, string password, bool isSuperAdmin)
+        {
+            var foundAccount = GetAdminByUsername(userName);
+            if (foundAccount is not null)
+                throw new InvalidOperationException($"Admin with username: {userName} already existed");
+            var newAccount = new AdminAccount(userName, password, isSuperAdmin);
+
+            _adminAccountRepository.Insert(newAccount);
+
+            return newAccount;
+        }
+
+        public string TryGetAdminToken(string userName, string password)
+        {
+
+            var foundAdmin = GetAdminByUsername(userName);
+
+            if (foundAdmin is null)
+                return null;
+            var success = PasswordHelper
+                .CheckPasswordHash(password, foundAdmin.PasswordHash, foundAdmin.PasswordSalt);
+
+            if (!success)
+                return null;
+            return PasswordHelper.GenerateJwtToken(foundAdmin.Id, foundAdmin.Username);
+        }
+
         public int CountTotalUser()
         {
             return _userRepository.Count();

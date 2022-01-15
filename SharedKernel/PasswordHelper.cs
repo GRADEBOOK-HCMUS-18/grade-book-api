@@ -10,7 +10,7 @@ namespace SharedKernel
 {
     public static class PasswordHelper
     {
-        private static string GenerateJwtToken(int userId, string emailOrUsername)
+        public static string GenerateJwtToken(int userId, string emailOrUsername)
         {
             var hourToRefresher = 48;
             var tokenHandler = new JwtSecurityTokenHandler();
