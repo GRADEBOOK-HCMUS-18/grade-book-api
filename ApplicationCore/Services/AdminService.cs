@@ -103,5 +103,20 @@ namespace ApplicationCore.Services
             _userRepository.Update(foundUser);
             return foundUser;
         }
+
+        public User SetUserStudentIdentification(int userId, string newStudentId)
+        {
+            var foundUser = _userRepository.GetFirst(user => user.Id == userId);
+            if (foundUser is null)
+                return null;
+            var foundExistedStudentId = _userRepository.GetFirst(user => user.StudentIdentification == newStudentId);
+            if (foundExistedStudentId is not null)
+                throw new InvalidOperationException($"Student with StudentId: {newStudentId} already existed");
+
+            foundUser.StudentIdentification = newStudentId;
+            _userRepository.Update(foundUser);
+
+            return foundUser;
+        }
     }
 }

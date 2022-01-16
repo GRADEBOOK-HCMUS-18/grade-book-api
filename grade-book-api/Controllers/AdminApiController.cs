@@ -3,7 +3,6 @@ using System.Linq;
 using ApplicationCore.Interfaces;
 using grade_book_api.Requests.Admin;
 using grade_book_api.Responses.Admin;
-using grade_book_api.Responses.Authentication;
 using grade_book_api.Responses.Class;
 using grade_book_api.Responses.User;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +20,12 @@ namespace grade_book_api.Controllers
         private readonly IUserServices _userServices;
         private readonly IAdminService _adminService;
         private readonly IClassService _classService;
-        private readonly IUserJwtAuthService _authService;
-        public AdminApiController(IUserServices userServices, IAdminService adminService, IClassService classService, IUserJwtAuthService authService)
+
+        public AdminApiController(IUserServices userServices, IAdminService adminService, IClassService classService)
         {
             _userServices = userServices;
             _adminService = adminService;
             _classService = classService;
-            _authService = authService;
         }
 
         [HttpPost("authentication/register")]
@@ -95,7 +93,6 @@ namespace grade_book_api.Controllers
         {
             int currentUserId = GetCurrentUserIdFromToken();
             if (!_userServices.IsUserAdmin(currentUserId)) return Unauthorized(UnauthorizedString);
-            if (currentUserId == userId) return BadRequest($"Cannot lock your self: {currentUserId}");
             var user = _adminService.SetLockStateOfUser(userId, request.NewLockState);
 
             if (user is null) return NotFound();
@@ -104,9 +101,21 @@ namespace grade_book_api.Controllers
         }
 
         [HttpPut("user/{userId}/studentIdentification")]
-        public IActionResult ChangeStudentIdentificationOfAUser(int userId)
+        public IActionResult ChangeStudentIdentificationOfAUser(int userId,ChangeUserStudentIdentificationRequest request)
         {
-            return Ok("doing");
+            if (!_userServices.IsUserAdmin(GetCurrentUserIdFromToken())) return Unauthorized(UnauthorizedString);
+            try
+            {
+                var userResult = _adminService.SetUserStudentIdentification(userId, request.NewStudentIdentification);
+                if (userResult is null)
+                    return NotFound();
+                return Ok( new UserDetailedInformationResponse(userResult));
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message); 
+            }
         }
 
         [HttpGet("class")]

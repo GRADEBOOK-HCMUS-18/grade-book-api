@@ -21,5 +21,7 @@ namespace ApplicationCore.Interfaces
         List<AdminAccount> GetPagedAdminsList(int numberPerPage, int pageNumber); 
 
         User SetLockStateOfUser(int userId, bool newState);
+
+        User SetUserStudentIdentification(int userId, string newStudentId);
     }
 }
