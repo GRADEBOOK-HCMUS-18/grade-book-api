@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SharedKernel;
 
@@ -19,6 +20,8 @@ namespace ApplicationCore.Entity
         
         public bool IsLocked { get; set; } 
         public bool IsEmailConfirmed { get; set; }
+        
+        public DateTime DateCreated { get; set; }
         public IList<ClassStudentsAccount> ClassStudentsAccounts { get; set; } = new List<ClassStudentsAccount>();
         public IList<ClassTeachersAccount> ClassTeachersAccounts { get; set; } = new List<ClassTeachersAccount>();
 
@@ -56,6 +59,7 @@ namespace ApplicationCore.Entity
             PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
             PasswordSalt = newPasswordSalt;
             PasswordHash = newPasswordHash;
+            DateCreated = DateTime.Now;
         }
         
         public User(){}

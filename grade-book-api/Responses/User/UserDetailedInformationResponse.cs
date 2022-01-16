@@ -1,3 +1,5 @@
+using System;
+
 namespace grade_book_api.Responses.User
 {
     public class UserDetailedInformationResponse
@@ -14,6 +16,7 @@ namespace grade_book_api.Responses.User
             StudentIdentification = source.StudentIdentification;
             IsLocked = source.IsLocked;
             IsEmailConfirmed = source.IsEmailConfirmed;
+            DateCreated = source.DateCreated;
         }
         
         public int Id { get; set; }
@@ -30,5 +33,6 @@ namespace grade_book_api.Responses.User
         public bool IsLocked { get; set; }
         
         public bool IsEmailConfirmed { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }
