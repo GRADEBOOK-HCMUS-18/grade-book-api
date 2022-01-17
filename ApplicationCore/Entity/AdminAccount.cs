@@ -24,6 +24,17 @@ namespace ApplicationCore.Entity
             PasswordHash = newPasswordHash;
             PasswordSalt = newPasswordSalt; 
         }
+        public AdminAccount(int id ,string username,  string password, bool isSuperAdmin)
+        {
+            Id = id;
+            Username = username;
+            IsSuperAdmin = isSuperAdmin;
+            DateCreated = DateTime.Now;
+            PasswordHelper.HashPassword(password,out var newPasswordSalt, out var newPasswordHash );
+
+            PasswordHash = newPasswordHash;
+            PasswordSalt = newPasswordSalt; 
+        }
         
         public AdminAccount(){}
     }

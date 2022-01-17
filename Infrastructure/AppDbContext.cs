@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ApplicationCore.Entity;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,12 +33,9 @@ namespace Infrastructure
             modelBuilder.Entity<ClassTeachersAccount>().HasKey(ct => new {ct.ClassId, ct.TeacherId});
             SetupTeacherAccountAndClassRelationship(modelBuilder);
 
-            var initAdminAccount = new AdminAccount("admin", "admin123", true);
-            initAdminAccount.Id = 2022;
-
-            modelBuilder.Entity<AdminAccount>().HasData(initAdminAccount);
 
             //modelBuilder.Entity<StudentRecord>().HasKey(s => new {s.RecordId});
+            SetupClassAndAssignmentRelationship(modelBuilder);
             SetupUserAndConfirmationRequestRelationship(modelBuilder);
             SetupUserAndPasswordChangeRequestRelationship(modelBuilder);
             SetupClassAndStudentRelationship(modelBuilder);
@@ -49,12 +47,33 @@ namespace Infrastructure
             SetupNotificationAndReviewRequestRelationship(modelBuilder);
             SetupAssignmentGradeReviewAndReplyRelationship(modelBuilder);
             SetupUserAndGradeReviewReplyRelationship(modelBuilder);
+            SetupSeedData(modelBuilder);
             foreach (var foreignKey in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
                 foreignKey.DeleteBehavior = DeleteBehavior.Cascade;
         }
 
- 
+        private static void SetupSeedData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().HasData(new List<User> { SeedData.SeedUser, SeedData.SeedUser2 });
+            modelBuilder.Entity<AdminAccount>().HasData(SeedData.SeedAdmin);
+            modelBuilder.Entity<Class>().HasData(SeedData.SeedClass);
+            modelBuilder.Entity<ClassStudentsAccount>().HasData(SeedData.SeedClassStudentAccount);
+            modelBuilder.Entity<ClassTeachersAccount>().HasData(SeedData.SeedClassTeacherAccount);
+            modelBuilder.Entity<StudentRecord>().HasData(SeedData.SeedStudentRecord);
+            modelBuilder.Entity<Assignment>().HasData(SeedData.SeedAssignment);
+            modelBuilder.Entity<StudentAssignmentGrade>().HasData(SeedData.SeedStudentAssignmentGrade);
+            modelBuilder.Entity<AssignmentGradeReviewRequest>().HasData(SeedData.SeedReviewRequest);
+            modelBuilder.Entity<GradeReviewReply>().HasData(SeedData.SeedReviewReply);
+        }
 
+        
+
+        private static void SetupClassAndAssignmentRelationship(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Assignment>().HasOne(a => a.Class)
+                .WithMany(c => c.ClassAssignments)
+                .HasForeignKey(a => a.ClassId);
+        }
         private static void SetupUserAndConfirmationRequestRelationship(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AccountConfirmationRequest>()

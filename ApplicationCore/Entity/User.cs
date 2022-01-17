@@ -62,6 +62,22 @@ namespace ApplicationCore.Entity
             DateCreated = DateTime.Now;
         }
         
+        public User(int id,string email, string firstName, string lastName, string password, string profilePictureUrl,
+            string defaultProfilePictureHex)
+        {
+            Id = id;
+            Email = email;
+            FirstName = firstName;
+            LastName = lastName;
+            IsPasswordNotSet = string.IsNullOrEmpty(password);
+            ProfilePictureUrl = profilePictureUrl;
+            DefaultProfilePictureHex = defaultProfilePictureHex;
+            PasswordHelper.HashPassword(password, out var newPasswordSalt, out var newPasswordHash);
+            PasswordSalt = newPasswordSalt;
+            PasswordHash = newPasswordHash;
+            DateCreated = DateTime.Now;
+        }
+        
         public User(){}
     }
 }

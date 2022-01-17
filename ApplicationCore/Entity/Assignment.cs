@@ -11,6 +11,8 @@ namespace ApplicationCore.Entity
         public int Weight { get; set; }
         public int Priority { get; set; }
         public Class Class { get; set; }
+        
+        public int ClassId { get; set; }
 
         public IList<StudentAssignmentGrade> StudentAssignmentGrades { get; set; } = new List<StudentAssignmentGrade>();
 
